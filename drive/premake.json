@@ -1,0 +1,18 @@
+{
+        "projects" : [
+                {
+                        "name" : "karbon_drive",
+                        "kind" : "StaticLib",
+                        "language" : "C",
+
+                        "include_dirs_public" : [
+                                "./include/"
+                        ],
+
+                        "files" : [
+                                "./**.h",
+                                "./**.c"
+                        ]
+                }
+        ]
+}

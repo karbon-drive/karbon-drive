@@ -36,12 +36,39 @@ kdi_ctx_get_vendor_string(
 
 
 int
+kdi_ctx_get_exe_dir(
+        void *ctx,
+        char **out_str,
+        int *out_size)
+{
+        (void)ctx;
+
+        #ifdef __linux__
+        const char *base_dir = "/home/phil/scratch/karbon-test/build/bin/Development/";
+        #else
+        const char *base_dir = "/Users/PhilCK/Developer/roa/build/bin/Development/";
+        #endif
+
+        if(out_size) {
+                *out_size = strlen(base_dir) + 1;
+        }
+
+        if(out_str) {
+                memcpy(*out_str, base_dir, strlen(base_dir) + 1);
+        }
+
+        return KC_OK;
+}
+
+
+int
 kdi_alloc_tagged(
         void *ctx,
         const struct kd_alloc_desc *desc,
         void **out_addr,
         int *out_bytes)
 {
+        (void)desc;
         kc_ctx_t core_ctx = (kc_ctx_t)ctx;
         
         struct kci_tagged_allocator *alloc_ctx = &core_ctx->allocator_tagged;

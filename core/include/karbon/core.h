@@ -27,18 +27,13 @@ typedef enum kc_struct_id {
 
 
 typedef struct kc_ctx * kc_ctx_t;
-
+typedef void(*KC_LOG_FN)(const char*);
 
 struct kc_ctx_desc {
         kc_struct_id type_id;
         void * ext;
         
-        KD_CTX_GET_VENDOR_STRING_FN ctx_vendor_str_fn;
-        
-        KD_WINDOW_GET_FN win_get_fn;
-        KD_WINDOW_SET_FN win_set_fn;
-        
-        KD_ALLOC_FN alloc_fn;
+        KC_LOG_FN log_fn;
         
         void * user_data;
 };

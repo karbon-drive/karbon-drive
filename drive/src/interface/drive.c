@@ -32,6 +32,30 @@ kd_ctx_get_vendor_string(
 }
 
 
+KD_CTX_GET_EXE_DIR_FN kd_ctx_get_exe_dir_fn;
+
+
+kd_result
+kd_ctx_get_exe_dir(
+        char **out_buffer,
+        int *out_size)
+{
+        if(KD_PCHECK && !ctx) {
+                KD_ASSERT(0 && "KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if(KD_PCHECK && (!out_buffer && !out_size)) {
+                KD_ASSERT(0 && "KD_RESULT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        int res = kd_ctx_get_exe_dir_fn(ctx, out_buffer, out_size);
+
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
 /* ------------------------------------------------------------- Allocator -- */
 
 

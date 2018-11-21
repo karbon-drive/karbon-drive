@@ -4,7 +4,14 @@
 
 int
 kdi_ctx_get_vendor_string(
-        void *ext,
+        void *ctx,
+        char **str,
+        int *len);
+
+
+int
+kdi_ctx_get_exe_dir(
+        void *ctx,
         char **str,
         int *len);
 

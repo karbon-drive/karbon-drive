@@ -32,7 +32,7 @@ extern "C" {
 
 
 typedef enum _kd_result {
-        KD_RESULT_OK,
+  KD_RESULT_OK,
         KD_RESULT_FAIL,
         KD_RESULT_CORRUPTED,
         KD_RESULT_INVALID_PARAM,
@@ -65,8 +65,17 @@ kd_ctx_get_vendor_string(
         int *out_size);
 
 
+kd_result
+kd_ctx_get_exe_dir(
+        char **out_buffer,
+        int *out_size);
+
+
 typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char**, int*);
 extern KD_CTX_GET_VENDOR_STRING_FN kd_ctx_get_vendor_string_fn;
+
+typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char**, int*);
+extern KD_CTX_GET_EXE_DIR_FN kd_ctx_get_exe_dir_fn;
 
 
 /* ------------------------------------------------------------- Allocator -- */
@@ -187,6 +196,7 @@ extern KD_WINDOW_SET_FN kd_window_set_fn;
 enum kd_api_hooks {
         KD_PTR_CTX,
         KD_FUNC_CTX_VENDOR_STRING,
+        KD_FUNC_CTX_EXE_DIR,
         KD_FUNC_ALLOC,
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,

@@ -17,6 +17,7 @@ struct kci_ctx_fn {
         KD_WINDOW_GET_FN win_get;
         KD_WINDOW_SET_FN win_set;
         KD_ALLOC_FN alloc;
+
 };
 
 
@@ -38,6 +39,8 @@ struct kci_libs {
 struct kc_ctx {
         struct kci_ctx_fn fn_ctx;
         struct kci_libs libs;
+        
+        KC_LOG_FN log_fn;
         
         struct kci_tagged_allocator allocator_tagged;
         

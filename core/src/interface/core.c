@@ -1,6 +1,13 @@
 #include <karbon/core.h>
 #include <stdlib.h>
+#include <string.h>
+
+#ifdef _WIN32
 #include "../thirdparty/dirent.h"
+#else
+#include <dirent.h>
+#endif
+
 #include "../allocators/tagged_allocator.h"
 
 
@@ -33,6 +40,13 @@ kci_alloc_housekeeping(struct kc_ctx *ctx, void **addr, int *bytes) {
 }
 
 
+void
+kci_log_stub(const char *msg) {
+        (void)msg;
+        /* no user log fn */
+}
+
+
 /* --------------------------------------------------------------- Context -- */
 
 
@@ -43,15 +57,14 @@ kc_ctx_create(
 {
         struct kc_ctx *ctx = (struct kc_ctx*)malloc(sizeof(*ctx));
         
-        ctx->fn_ctx.vendor_ctx = desc->ctx_vendor_str_fn;
-        ctx->fn_ctx.alloc = desc->alloc_fn;
-        ctx->fn_ctx.win_get = desc->win_get_fn;
-        ctx->fn_ctx.win_set = desc->win_set_fn;
         ctx->user_data = desc->user_data;
+        ctx->log_fn = desc->log_fn ? desc->log_fn : kci_log_stub;
         
         kci_tag_alloc_init(&ctx->allocator_tagged);
         
         *out_ctx = ctx;
+
+        ctx->log_fn("Karbon CTX created");
         
         return KC_OK;
 }
@@ -91,58 +104,15 @@ kci_str_ends_with(
 }
 
 
-int
-kci_load_libs(
-        const char *base_dir,
-        char *in_out_buffer,
-        int *in_out_buffer_size,
-        kc_lib *out_libs,
-        int *out_count,
-        void **funcs)
-{
-        int count = 0;
-        kc_lib *libs = (kc_lib)&in_out_buffer[0];
-        
-        DIR *dir;
-        struct dirent *ent;
-        if ((dir = opendir (base_dir)) != NULL) {
-                while ((ent = readdir (dir)) != NULL) {
-                        if(kci_str_ends_with(ent->d_name, ".dylib")) {
-                                char str_buffer[2048] = {0};
-                                strcat(str_buffer, base_dir);
-                                strcat(str_buffer, ent->d_name);
-                                
-                                #ifndef _WIN32
-                                kc_lib lib =  dlopen(str_buffer, RTLD_NOW);
-                                KD_LOAD_FN load_fn = (KD_LOAD_FN)dlsym(lib, "kd_load");
-                                #else
-                                kc_lib lib = (void*)LoadLibrary(str_buffer);
-                                KD_LOAD_FN load_fn = (KD_LOAD_FN)GetProcAddress(lib, "kd_load");
-                                #endif
-                                
-                                if(lib && load_fn) {
-                                        load_fn(funcs);
-                                        libs[count++] = lib;
-                                }
-                        }
-                }
-        }
-        
-        in_out_buffer_size += (sizeof(kc_lib) * count);
-        in_out_buffer += (sizeof(kc_lib) * count);
-        
-        *out_libs = libs;
-        *out_count = count;
-        
-        return 1;
-}
-
-
 kc_result
 kc_application_start(
         kc_ctx_t ctx,
         const struct kc_application_desc * desc)
 {
+        (void)desc;
+
+        ctx->log_fn("Karbon Starting up... ");
+
         void *addr = 0; int bytes = 0;
         kci_alloc_housekeeping(ctx, &addr, &bytes);
         
@@ -152,7 +122,11 @@ kc_application_start(
 
         /* base directory */
         char *buffer = (char *)addr;
-        const char *base_dir = "/Users/PhilCK/Developer/roa/build/bin/Development/";
+        char *base_dir = buffer;
+        int count = 0;
+        kdi_ctx_get_exe_dir(ctx, &buffer, &count);
+        buffer += count;
+
         strncat(buffer, base_dir, bytes);
         bytes -= strlen(buffer);
         
@@ -160,6 +134,7 @@ kc_application_start(
         void * funcs[KD_FUNC_COUNT];
         funcs[KD_PTR_CTX] = (void*)ctx;
         funcs[KD_FUNC_CTX_VENDOR_STRING] = kdi_ctx_get_vendor_string;
+        funcs[KD_FUNC_CTX_EXE_DIR] = kdi_ctx_get_exe_dir;
         funcs[KD_FUNC_WINDOW_SET] = kdi_window_set;
         funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
         funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
@@ -187,7 +162,7 @@ kc_application_start(
                 if(!kci_str_ends_with(ent->d_name, ext)) {
                         continue;
                 }
-                
+
                 char str_buffer[2 << 11] = {0};
                 strcat(str_buffer, base_dir);
                 strcat(str_buffer, ent->d_name);
@@ -203,6 +178,8 @@ kc_application_start(
                 #endif
                 
                 if(lib && load_fn) {
+                        ctx->log_fn(&str_buffer[0]);
+
                         load_fn(funcs);
                         libs[lib_count++] = lib;
                 }
@@ -233,6 +210,8 @@ kc_application_start(
                 #endif
                 entry_fn();
         }
- 
+
+        ctx->log_fn("Karbon has finished");
+
         return KC_OK;
 }

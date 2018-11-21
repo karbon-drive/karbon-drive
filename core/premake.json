@@ -20,6 +20,10 @@
 
                         "dependencies" : [
                                 "karbon_drive"
+                        ],
+
+                        "links" : [
+                                "dl"
                         ]
                 }
         ]

@@ -2,7 +2,7 @@
         "projects" : [
                 {
                         "name" : "karbon_core",
-                        "kind" : "StaticLib",
+                        "kind" : "ConsoleApp",
                         "language" : "C",
 
                         "files" : [

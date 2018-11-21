@@ -1,6 +1,6 @@
 #include <karbon/core.h>
 #include <stdlib.h>
-#include "../thirdparty/tinydir.h"
+#include "../thirdparty/dirent.h"
 #include "../allocators/tagged_allocator.h"
 
 

@@ -69,90 +69,6 @@ typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char**, int*);
 extern KD_CTX_GET_VENDOR_STRING_FN kd_ctx_get_vendor_string_fn;
 
 
-
-/* ------------------------------------------------------------- Transform -- */
-
-
-
-
-
-/* ------------------------------------------------------------------ Mesh -- */
-
-
-
-
-
-/* -------------------------------------------------------------- Material -- */
-
-
-
-
-
-/* ------------------------------------------------------------ Renderable -- */
-
-
-
-
-
-/* ----------------------------------------------------------------- Chunk -- */
-
-
-struct kd_mesh_desc {
-        int mesh_buffer;
-        int mesh_data;
-        int mesh_offset;
-        int mesh_size;
-        
-        int index_buffer;
-        int index_data;
-        int index_offset;
-        int index_size;
-};
-
-
-struct kd_shader_desc {
-        int shader_buffer;
-        int shader_offset;
-        int shader_size;
-};
-
-
-struct kd_material_desc {
-        int shader_id;
-};
-
-
-struct kd_transform {
-        float position[3];
-        float scale[3];
-        float rotation[4];
-};
-
-
-struct kd_entity_desc {
-        int instance_id;
-        int material_id;
-        int mesh_id;
-        
-        struct kd_transform transform;
-};
-
-
-struct kd_chunk_desc {
-        kd_struct_id type_id;
-        void *ext;
-        
-        void **buffers;
-        int *buffers_sizes;
-        int buffer_count;
-        
-        struct kd_mesh_desc *meshes;
-        struct kd_shader_desc *shaders;
-        
-        struct kd_material_desc *material;
-};
-
-
 /* ------------------------------------------------------------- Allocator -- */
 
 
@@ -197,7 +113,7 @@ struct kd_window_desc {
 kd_result
 kd_window_get(
         struct kd_window_desc *desc);
-        
+
 
 kd_result
 kd_window_set(
@@ -239,6 +155,21 @@ extern KD_WINDOW_SET_FN kd_window_set_fn;
 #define KD_LINUX 0
 #define KD_NIX 0
 #define KD_UNKNOWN 1
+#endif
+
+
+#if defined(_WIN32)
+#define KD_GFX_DX12 1
+#define KD_GFX_VULKAN 0
+#define KD_GFX_METAL 0
+#elif defined(__APPLE__)
+#define KD_GFX_DX12 0
+#define KD_GFX_METAL 1
+#define KD_GFX_VULKAN 0
+#elif defined(__linux__)
+#define KD_GFX_DX12 0
+#define KD_GFX_METAL 0
+#define KD_GFX_VULKAN 1
 #endif
 
 

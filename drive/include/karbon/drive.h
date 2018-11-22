@@ -190,7 +190,7 @@ extern KD_WINDOW_SET_FN kd_window_set_fn;
 #define KD_API extern "C"
 //#pragma comment(linker, "/export:kd_load=_kd_load")
 #else
-#define KD_API
+#define KD_API extern "C"
 #define KD_EXPORT
 #endif
 

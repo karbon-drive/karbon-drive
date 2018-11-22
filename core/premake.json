@@ -23,7 +23,10 @@
                         ],
 
                         "links-linux" : [
-                                "dl"
+                                "dl",
+                                "X11",
+                                "GL",
+                                "GLU"
                         ]
                 }
         ]

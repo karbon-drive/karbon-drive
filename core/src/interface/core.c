@@ -216,11 +216,11 @@ kc_application_start(
         KD_THINKFN think_fn = 0;
         KD_LATETHINKFN late_fn = 0;
         KD_SETUPFN setup_fn = 0;
-        KD_SHUTDOWNFN shtudown_fn = 0;
+        KD_SHUTDOWNFN shutdown_fn = 0;
 
         void *clib = ctx->libs.libs[0];
 
-        #ifndef _WIN32
+        #if defined(__linux__)
         void *sym = dlsym(clib, KD_HOOK_EARLY_THINK_STR);
         early_fn = (KD_EARLYTHINKFN)sym;
 
@@ -234,8 +234,8 @@ kc_application_start(
         late_fn = (KD_SETUPFN)sym;
 
         sym = dlsym(clib, KD_HOOK_SHUTDOWN_STR);
-        shtudown_fn = (KD_SHUTDOWNFN)sym;
-        #else
+        shutdown_fn = (KD_SHUTDOWNFN)sym;
+        #elif defined(_WIN32)
         FARPROC sym = GetProcAddress(clib, KD_HOOK_EARLY_THINK_STR);
         early_fn = (KD_EARLYTHINKFN)sym;
 
@@ -249,7 +249,7 @@ kc_application_start(
         setup_fn = (KD_SETUPFN)sym;
 
         sym = GetProcAddress(clib, KD_HOOK_SHUTDOWN_STR);
-        shtudown_fn = (KD_SHUTDOWNFN)sym;
+        shutdown_fn = (KD_SHUTDOWNFN)sym;
         #endif
 
         if (setup_fn) {
@@ -269,6 +269,10 @@ kc_application_start(
                 if (late_fn) {
                         late_fn();
                 }
+        }
+
+        if(shutdown_fn) {
+                shutdown_fn();
         }
 
         ctx->log_fn("Karbon has finished");

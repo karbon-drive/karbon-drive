@@ -9,6 +9,9 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#elif defined(__linux__)
+#include <unistd.h>
+#include <libgen.h>
 #endif
 
 
@@ -48,81 +51,83 @@ kdi_ctx_get_exe_dir(
 {
         (void)ctx;
 
-        static char buffer_path[4096] = "\0";
+        #define KC_PATH_MAX 4096
+
+        static char buf_path[KC_PATH_MAX] = "\0";
 
         #if defined(_WIN32)
-        if (strcmp(buffer_path, "") == 0)
-        {
+        if (strcmp(buf_path, "") == 0) {
                 HMODULE hModule = GetModuleHandle(NULL);
-                if (hModule != NULL)
-                {
-                        GetModuleFileNameA(NULL, buffer_path, KC_ARR_COUNT(buffer_path));
-
-                        size_t path_length = 0;
-                        for (size_t i = 0; i < KC_ARR_COUNT(buffer_path); i++)
-                        {
-                                if (buffer_path[i] == '\0') {
-                                        path_length = i;
-                                        break;
-                                }
-                        }
-
-                        size_t last_slash_index = 0;
-                        for (size_t i = 0; i < path_length; i++)
-                        {
-                                size_t r_i = (path_length - 1) - i;
-                                if (buffer_path[r_i] == '/' || buffer_path[r_i] == '\\') {
-                                        last_slash_index = r_i;
-                                        break;
-                                }
-                        }
-
-                        buffer_path[last_slash_index + 1] = '\0';
+                if(hModule == NULL) {
+                        return 0;
                 }
-        }
-        #elif defined(__linux__)
-        if (strlen(buffer_path) == 0)
-        {
-                char buffer[2048] = {0};
 
-                unsigned int count = readlink("/proc/self/exe", buffer, sizeof(buffer));
+                GetModuleFileNameA(NULL, buf_path, KC_ARR_COUNT(buf_path));
 
-                if (count != (unsigned)-1)
-                {
-                        const char *path = dirname(buffer);
-                        strcpy(buffer_path, path);
-                        strcat(buffer_path, "/");
+                size_t path_length = 0;
+                for (size_t i = 0; i < KC_ARR_COUNT(buf_path); i++) {
+                        if (buf_path[i] == '\0') {
+                                path_length = i;
+                                break;
+                        }
                 }
-        }
-
-        return lib_ARR_DATA(buffer_path);
-        #elif defined(__APPLE__)
-        if (strlen(buffer_path) == 0)
-        {
-                proc_pidpath(getpid(), buffer_path, sizeof(buffer_path));
-
-                size_t i;
-                size_t buffer_length = (size_t)strlen(buffer_path);
 
                 size_t last_slash_index = 0;
-                for (i = 0; i < buffer_length; i++) {
-                        size_t r_i = (buffer_length - 1) - i;
-                        if (buffer_path[r_i] == '/' || buffer_path[r_i] == '\\') {
+                for (size_t i = 0; i < path_length; i++) {
+                        size_t r_i = (path_length - 1) - i;
+                        if (buf_path[r_i] == '/' || buf_path[r_i] == '\\') {
                                 last_slash_index = r_i;
                                 break;
                         }
                 }
 
-                buffer_path[last_slash_index + 1] = '\0';
+                buf_path[last_slash_index + 1] = '\0';
+        }
+        #elif defined(__linux__)
+        if (strlen(buf_path) == 0) {
+                char buf[KC_PATH_MAX] = {0};
+                unsigned count = readlink("/proc/self/exe", buf, sizeof(buf));
+
+                if (count == (unsigned)-1) {
+                        return 0;
+                }
+
+                const char *path = dirname(buf);
+                strcpy(buf_path, path);
+                strcat(buf_path, "/");
+        }
+        #elif defined(__APPLE__)
+        if (strlen(buf_path) == 0) {
+                proc_pidpath(getpid(), buf_path, sizeof(buf_path));
+
+                size_t i;
+                size_t length = (size_t)strlen(buf_path);
+
+                if(length == 0) {
+                        return 0;
+                }
+
+                size_t last_slash_index = 0;
+                for (i = 0; i < length; i++) {
+                        size_t r_i = (length - 1) - i;
+                        if (buf_path[r_i] == '/' || buf_path[r_i] == '\\') {
+                                last_slash_index = r_i;
+                                break;
+                        }
+                }
+
+                buf_path[last_slash_index + 1] = '\0';
         }
         #endif
 
+        #undef KC_PATH_MAX
+
         if(out_size) {
-                *out_size = strlen(buffer_path) + 1;
+                *out_size = strlen(buf_path) + 1;
         }
 
         if(out_str) {
-                memcpy(*out_str, buffer_path, strlen(buffer_path) + 1);
+                memcpy(*out_str, buf_path, strlen(buf_path) + 1);
         }
 
         return KC_OK;

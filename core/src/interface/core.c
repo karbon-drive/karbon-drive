@@ -10,7 +10,6 @@
 
 #include "../allocators/tagged_allocator.h"
 
-
 #ifdef _WIN32
 #include <Windows.h>
 #else
@@ -61,6 +60,7 @@ kc_ctx_create(
         ctx->log_fn = desc->log_fn ? desc->log_fn : kci_log_stub;
         
         kci_tag_alloc_init(&ctx->allocator_tagged);
+        kci_platform_setup(&ctx->platform);
         
         *out_ctx = ctx;
 
@@ -209,6 +209,66 @@ kc_application_start(
                 KD_PROJENTRYFN entry_fn = (KD_PROJENTRYFN)sym;
                 #endif
                 entry_fn();
+        }
+
+        /* get tick funcs */
+        KD_EARLYTHINKFN early_fn = 0;
+        KD_THINKFN think_fn = 0;
+        KD_LATETHINKFN late_fn = 0;
+        KD_SETUPFN setup_fn = 0;
+        KD_SHUTDOWNFN shtudown_fn = 0;
+
+        void *clib = ctx->libs.libs[0];
+
+        #ifndef _WIN32
+        void *sym = dlsym(clib, KD_HOOK_EARLY_THINK_STR);
+        early_fn = (KD_EARLYTHINKFN)sym;
+
+        sym = dlsym(clib, KD_HOOK_THINK_STR);
+        think_fn = (KD_THINKFN)sym;
+
+        sym = dlsym(clib, KD_HOOK_LATE_THINK_STR);
+        late_fn = (KD_LATETHINKFN)sym;
+
+        sym = dlsym(clib, KD_HOOK_SETUP_STR);
+        late_fn = (KD_SETUPFN)sym;
+
+        sym = dlsym(clib, KD_HOOK_SHUTDOWN_STR);
+        shtudown_fn = (KD_SHUTDOWNFN)sym;
+        #else
+        FARPROC sym = GetProcAddress(clib, KD_HOOK_EARLY_THINK_STR);
+        early_fn = (KD_EARLYTHINKFN)sym;
+
+        sym = GetProcAddress(clib, KD_HOOK_THINK_STR);
+        think_fn = (KD_THINKFN)sym;
+
+        sym = GetProcAddress(clib, KD_HOOK_LATE_THINK_STR);
+        late_fn = (KD_LATETHINKFN)sym;
+
+        sym = GetProcAddress(clib, KD_HOOK_SETUP_STR);
+        setup_fn = (KD_SETUPFN)sym;
+
+        sym = GetProcAddress(clib, KD_HOOK_SHUTDOWN_STR);
+        shtudown_fn = (KD_SHUTDOWNFN)sym;
+        #endif
+
+        if (setup_fn) {
+                setup_fn();
+        }
+
+        /* loop */
+        while(kci_platform_process(&ctx->platform)) {
+                if (early_fn) {
+                        early_fn();
+                }
+
+                if (think_fn) {
+                        think_fn();
+                }
+
+                if (late_fn) {
+                        late_fn();
+                }
         }
 
         ctx->log_fn("Karbon has finished");

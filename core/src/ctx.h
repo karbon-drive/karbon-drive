@@ -5,6 +5,7 @@
 #include <karbon/core.h>
 #include <karbon/drive.h>
 #include "allocators/tagged_allocator.h"
+#include "platform/platform.h"
 
 
 typedef enum _kd_alloc_id {
@@ -31,7 +32,6 @@ typedef void *kc_lib;
 
 struct kci_libs {
         kc_lib *libs;
-        KD_LOGICTICKFN *ticks;
         int count;
 };
 
@@ -43,6 +43,7 @@ struct kc_ctx {
         KC_LOG_FN log_fn;
         
         struct kci_tagged_allocator allocator_tagged;
+        struct kci_platform platform;
         
         void *user_data;
 };

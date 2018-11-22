@@ -22,7 +22,7 @@
                                 "karbon_drive"
                         ],
 
-                        "links" : [
+                        "links-linux" : [
                                 "dl"
                         ]
                 }

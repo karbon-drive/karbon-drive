@@ -158,6 +158,7 @@ kd_load(void ** funcs)
 {
         ctx = funcs[KD_PTR_CTX];
         kd_ctx_get_vendor_string_fn = funcs[KD_FUNC_CTX_VENDOR_STRING];
+        kd_ctx_get_exe_dir_fn = funcs[KD_FUNC_CTX_EXE_DIR];
         kd_window_get_fn = funcs[KD_FUNC_WINDOW_GET];
         kd_window_set_fn = funcs[KD_FUNC_WINDOW_SET];
         kd_alloc_fn = funcs[KD_FUNC_ALLOC];

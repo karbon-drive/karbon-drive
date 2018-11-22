@@ -2,11 +2,6 @@
 #define KARBON_DRIVE
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 /* ------------------------------------------------- Types and Identifiers -- */
 
 
@@ -28,6 +23,11 @@ extern "C" {
 #else
         #include <cstdint>
         #include <cstddef>
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 
@@ -53,7 +53,7 @@ typedef enum _kd_bool {
 } kd_bool;
 
 
-extern void *ctx;
+extern void *ctx; /* remove */
 
 
 /* --------------------------------------------------------------- Context -- */
@@ -187,8 +187,10 @@ extern KD_WINDOW_SET_FN kd_window_set_fn;
 
 #ifdef _WIN32
 #define KD_EXPORT __declspec(dllexport)
-#pragma comment(linker, "/export:kd_load=_kd_load")
+#define KD_API extern "C"
+//#pragma comment(linker, "/export:kd_load=_kd_load")
 #else
+#define KD_API
 #define KD_EXPORT
 #endif
 
@@ -205,7 +207,7 @@ enum kd_api_hooks {
 };
 
 
-int
+KD_EXPORT int
 kd_load(void ** funcs);
 
 
@@ -216,10 +218,22 @@ kd_load(void ** funcs);
 typedef int(*KD_LOAD_FN)(void**);
 
 #define KD_HOOK_PROJECT_ENTRY_STR "kd_project_entry"
-typedef int(*KD_PROJENTRYFN)();
+typedef void(*KD_PROJENTRYFN)();
 
-#define KD_HOOK_LOGIC_STR "kd_logic_tick"
-typedef int(*KD_LOGICTICKFN)();
+#define KD_HOOK_SETUP_STR "kd_setup"
+typedef void(*KD_SETUPFN)();
+
+#define KD_HOOK_SHUTDOWN_STR "kd_shutdown"
+typedef void(*KD_SHUTDOWNFN)();
+
+#define KD_HOOK_EARLY_THINK_STR "kd_early_think"
+typedef void(*KD_EARLYTHINKFN)();
+
+#define KD_HOOK_THINK_STR "kd_think"
+typedef void(*KD_THINKFN)();
+
+#define KD_HOOK_LATE_THINK_STR "kd_late_think"
+typedef void(*KD_LATETHINKFN)();
 
 
 #ifdef __cplusplus

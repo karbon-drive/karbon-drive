@@ -1,9 +1,11 @@
 #ifndef WINDOW_INCLUDED
 #define WINDOW_INCLUDED
 
+#if defined(__linux__)
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#endif
 
 struct kci_platform {
         #ifdef _WIN32
@@ -13,6 +15,7 @@ struct kci_platform {
 
         int width;
         int height;
+
         #elif defined(__linux__)
         Display                 *dpy;
         Window                  root;

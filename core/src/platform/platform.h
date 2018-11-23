@@ -7,6 +7,7 @@
 #include <X11/Xutil.h>
 #endif
 
+
 struct kci_platform {
         #ifdef _WIN32
         void *h_instance;
@@ -36,6 +37,11 @@ kci_platform_setup(
 int
 kci_platform_process(
         struct kci_platform *win);
+
+
+int
+kci_platform_destroy(
+        struct kci_platform *plat);
 
 
 #endif

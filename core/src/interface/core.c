@@ -138,6 +138,7 @@ kc_application_start(
         funcs[KD_FUNC_WINDOW_SET] = kdi_window_set;
         funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
         funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
+        funcs[KD_FUNC_CHUNK_ADD] = kdi_chunk_add;
         
         /* find libs and load symbols */
         int lib_count = 0;

@@ -33,5 +33,10 @@ kdi_window_set(
         void *ctx,
         const struct kd_window_desc *desc);
 
+int
+kdi_chunk_add(
+        void *ctx,
+        const struct kd_chunk_desc *desc);
+
 
 #endif

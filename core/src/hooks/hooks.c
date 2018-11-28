@@ -175,3 +175,15 @@ kdi_window_set(
         
         return 0;
 }
+
+
+int
+kdi_chunk_add(
+        void *ctx,
+        const struct kd_chunk_desc *desc)
+{
+        (void)ctx;
+        (void)desc;
+
+        return 0;
+}

@@ -3,6 +3,11 @@
 #include "platform.h"
 
 
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+
+
 static void
 internal_destroy_window(
         struct kci_platform *ctx)
@@ -192,7 +197,7 @@ kci_platform_process(
                 }
         }
 
-        SwapBuffers(plat->dc);
+        //SwapBuffers(plat->dc);
 
         return plat->hwnd ? 1 : 0;
 }

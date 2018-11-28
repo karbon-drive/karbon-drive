@@ -44,6 +44,7 @@ typedef enum _kd_struct_id {
         KD_STRUCT_WINDOW_DESC,
         KD_STRUCT_ALLOCATOR_FRAME_DESC,
         KD_STRUCT_ALLOC_DESC,
+        KD_STRUCT_CHUNK_DESC,
 } kd_struct_id;
 
 
@@ -137,6 +138,47 @@ typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
 extern KD_WINDOW_SET_FN kd_window_set_fn;
 
 
+/* ----------------------------------------------------------------- Chunk -- */
+
+
+struct kd_buffer_data {
+        int buffer;
+        int buffer_offset;
+        int buffer_size;
+};
+
+
+struct kd_mesh_data {
+        struct kd_buffer_data geometry;
+        int geometry_type;
+        
+        struct kd_buffer_data index;
+        int index_type;
+};
+
+
+struct kd_chunk_desc {
+        kd_struct_id type_id; /* KD_STRUCT_CHUNK_DESC */
+        void * ext;
+        
+        struct kd_mesh_data *mesh_data;
+        int mesh_count;
+
+        uint8_t **buffers;
+        int buffer_count;
+};
+
+
+kd_result
+kd_chunk_add(
+        const struct kd_chunk_desc * desc,
+        uint32_t *out_chunk_id);
+
+
+typedef int(*KD_CHUNK_ADD_FN)(void *, const struct kd_chunk_desc *desc);
+extern KD_CHUNK_ADD_FN kd_chunk_add_fn;
+
+
 /* -------------------------------------------------------------- Platform -- */
 
 
@@ -202,6 +244,7 @@ enum kd_api_hooks {
         KD_FUNC_ALLOC,
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,
+        KD_FUNC_CHUNK_ADD,
         
         KD_FUNC_COUNT
 };

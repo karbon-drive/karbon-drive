@@ -1,4 +1,5 @@
 #include <karbon/core.h>
+#include "../fundamental.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -61,6 +62,19 @@ kc_ctx_create(
         
         kci_tag_alloc_init(&ctx->allocator_tagged);
         kci_platform_setup(&ctx->platform);
+
+        /* setup some arrays */
+        struct kci_camera *cams = 0;
+        kc_array_create_with_capacity(cams, KCI_MAX_CAMERA);
+        ctx->rdr_data.cameras = cams;
+
+        struct kci_rdr_chunk *chunks = 0;
+        kc_array_create_with_capacity(chunks, KCI_MAX_CHUNKS);
+        ctx->rdr_data.chunks = chunks;
+
+        struct kci_rdr_chunk **pending_chunks = 0;
+        kc_array_create_with_capacity(pending_chunks, KCI_MAX_CHUNKS);
+        ctx->rdr_data.pending_chunks = pending_chunks;
         
         *out_ctx = ctx;
 
@@ -191,16 +205,19 @@ kc_application_start(
         
         /* copy libs out of frame buffer */
         int lib_bytes = sizeof(kc_lib) * lib_count;
-        
-        ctx->libs.count = lib_count;
-        ctx->libs.libs = malloc(lib_bytes);
-        memcpy(ctx->libs.libs, libs, lib_bytes);
+
+        kc_lib *lib_arr = 0;
+        kc_array_create_with_capacity(lib_arr, lib_count);
+        kc_array_resize(lib_arr, lib_count);
+        memcpy(lib_arr, libs, lib_bytes);
+
+        ctx->apps.libs = lib_arr;
         
         /* call project entry on libs */
         int i;
         
         for(i = 0; i < lib_count; ++i) {
-                kc_lib lib = libs[i];
+                kc_lib lib = ctx->apps.libs[i];
         
                 #ifndef _WIN32
                 void *sym = dlsym(lib, KD_HOOK_PROJECT_ENTRY_STR);
@@ -219,7 +236,7 @@ kc_application_start(
         KD_SETUPFN setup_fn = 0;
         KD_SHUTDOWNFN shutdown_fn = 0;
 
-        void *clib = ctx->libs.libs[0];
+        void *clib = ctx->apps.libs[0];
 
         #if defined(__linux__)
         void *sym = dlsym(clib, KD_HOOK_EARLY_THINK_STR);

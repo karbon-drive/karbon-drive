@@ -27,18 +27,56 @@ struct kci_alloc_fn {
 };
 
 
+/* ------------------------------------------------------------------ Libs -- */
+
+
 typedef void *kc_lib;
 
 
-struct kci_libs {
-        kc_lib *libs;
-        int count;
+struct kci_applications {
+        /* array */ kc_lib *libs;
 };
+
+
+/* ----------------------------------------------------------------- Chunk -- */
+
+
+struct kci_chunk {
+        int i;
+};
+
+
+
+/* -------------------------------------------------------------- Renderer -- */
+
+
+struct kci_rdr_chunk {
+        int i;
+};
+
+
+struct kci_camera {
+        int i;
+};
+
+
+#define KCI_MAX_CAMERA 4
+#define KCI_MAX_CHUNKS 32
+
+
+struct kci_rdr {
+        /* array */ struct kci_camera *cameras;
+        /* array */ struct kci_rdr_chunk *chunks;
+        /* array */ struct kci_rdr_chunk **pending_chunks;
+};
+
+
+/* --------------------------------------------------------------- Context -- */
 
 
 struct kc_ctx {
         struct kci_ctx_fn fn_ctx;
-        struct kci_libs libs;
+        struct kci_applications apps;
         
         KC_LOG_FN log_fn;
         
@@ -46,6 +84,8 @@ struct kc_ctx {
         struct kci_platform platform;
         
         void *user_data;
+
+        struct kci_rdr rdr_data;
 };
 
 #endif

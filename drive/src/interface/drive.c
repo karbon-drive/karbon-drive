@@ -177,7 +177,7 @@ kd_chunk_add(
                 return KD_RESULT_INVALID_DESC;
         }
 
-        int res = kd_chunk_add_fn(ctx, desc);
+        int res = kd_chunk_add_fn(ctx, desc, out_chunk_id);
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
 

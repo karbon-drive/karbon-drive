@@ -2,6 +2,9 @@
 #define HOOKS_INCLUDED
 
 
+#include <stdint.h>
+
+
 int
 kdi_ctx_get_vendor_string(
         void *ctx,
@@ -36,7 +39,8 @@ kdi_window_set(
 int
 kdi_chunk_add(
         void *ctx,
-        const struct kd_chunk_desc *desc);
+        const struct kd_chunk_desc *desc,
+        uint32_t *out_chunk_id);
 
 
 #endif

@@ -32,7 +32,7 @@ kdi_ctx_get_vendor_string(
         #endif
         
         if(out_size) {
-                *out_size = strlen(vendor_string) + 1;
+                *out_size = (int)strlen(vendor_string) + 1;
         }
         
         if(out_str) {
@@ -180,10 +180,12 @@ kdi_window_set(
 int
 kdi_chunk_add(
         void *ctx,
-        const struct kd_chunk_desc *desc)
+        const struct kd_chunk_desc *desc,
+        uint32_t *out_chunk_id)
 {
         (void)ctx;
         (void)desc;
+        (void)out_chunk_id;
 
         return 0;
 }

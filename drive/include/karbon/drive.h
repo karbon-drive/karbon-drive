@@ -54,7 +54,7 @@ typedef enum _kd_bool {
 } kd_bool;
 
 
-extern void *ctx; /* remove */
+//extern void *ctx; /* remove */
 
 
 /* --------------------------------------------------------------- Context -- */
@@ -73,10 +73,10 @@ kd_ctx_get_exe_dir(
 
 
 typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char**, int*);
-extern KD_CTX_GET_VENDOR_STRING_FN kd_ctx_get_vendor_string_fn;
+//extern KD_CTX_GET_VENDOR_STRING_FN kd_ctx_get_vendor_string_fn;
 
 typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char**, int*);
-extern KD_CTX_GET_EXE_DIR_FN kd_ctx_get_exe_dir_fn;
+//extern KD_CTX_GET_EXE_DIR_FN kd_ctx_get_exe_dir_fn;
 
 
 /* ------------------------------------------------------------- Allocator -- */
@@ -104,7 +104,7 @@ kd_alloc(
 
 
 typedef int(*KD_ALLOC_FN)(void *,const struct kd_alloc_desc *desc, void ** out_addr, int *bytes);
-extern KD_ALLOC_FN kd_alloc_fn;
+//extern KD_ALLOC_FN kd_alloc_fn;
 
 
 /* ---------------------------------------------------------------- Window -- */
@@ -131,11 +131,11 @@ kd_window_set(
 
 
 typedef int(*KD_WINDOW_GET_FN)(void *,struct kd_window_desc *desc);
-extern KD_WINDOW_GET_FN kd_window_get_fn;
+//extern KD_WINDOW_GET_FN kd_window_get_fn;
 
 
 typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
-extern KD_WINDOW_SET_FN kd_window_set_fn;
+//extern KD_WINDOW_SET_FN kd_window_set_fn;
 
 
 /* ----------------------------------------------------------------- Chunk -- */
@@ -175,8 +175,8 @@ kd_chunk_add(
         uint32_t *out_chunk_id);
 
 
-typedef int(*KD_CHUNK_ADD_FN)(void *, const struct kd_chunk_desc *desc);
-extern KD_CHUNK_ADD_FN kd_chunk_add_fn;
+typedef int(*KD_CHUNK_ADD_FN)(void *, const struct kd_chunk_desc *desc, uint32_t *out_chunk_id);
+//extern KD_CHUNK_ADD_FN kd_chunk_add_fn;
 
 
 /* -------------------------------------------------------------- Platform -- */
@@ -206,21 +206,6 @@ extern KD_CHUNK_ADD_FN kd_chunk_add_fn;
 #define KD_LINUX 0
 #define KD_NIX 0
 #define KD_UNKNOWN 1
-#endif
-
-
-#if defined(_WIN32)
-#define KD_GFX_DX12 1
-#define KD_GFX_VULKAN 0
-#define KD_GFX_METAL 0
-#elif defined(__APPLE__)
-#define KD_GFX_DX12 0
-#define KD_GFX_METAL 1
-#define KD_GFX_VULKAN 0
-#elif defined(__linux__)
-#define KD_GFX_DX12 0
-#define KD_GFX_METAL 0
-#define KD_GFX_VULKAN 1
 #endif
 
 

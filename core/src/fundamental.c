@@ -3,6 +3,37 @@
 #include <string.h>
 
 
+/* -------------------------------------------------------------- Lifetime -- */
+
+
+kc_bool
+fundamental_startup() {
+
+}
+
+
+kc_bool
+fundamental_shutdown() {
+
+}
+
+
+/* ------------------------------------------------------------ Allocation -- */
+
+
+typedef enum _kc_alloc_type {
+        KC_ALLOC_HOUSEKEEPING,
+        KC_ALLOC_RENDERER,
+} kc_alloc_type;
+
+
+kc_bool
+kc_alloc_frame(kc_alloc_type type, void **out_addr, int *bytes) {
+
+}
+
+
+
 /* -------------------------------------------------------- Stretchy Array -- */
 
 

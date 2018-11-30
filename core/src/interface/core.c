@@ -153,6 +153,7 @@ kc_application_start(
         funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
         funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
         funcs[KD_FUNC_CHUNK_ADD] = kdi_chunk_add;
+        funcs[KD_FUNC_LOG] = kdi_log;
         
         /* find libs and load symbols */
         int lib_count = 0;
@@ -249,7 +250,7 @@ kc_application_start(
         late_fn = (KD_LATETHINKFN)sym;
 
         sym = dlsym(clib, KD_HOOK_SETUP_STR);
-        late_fn = (KD_SETUPFN)sym;
+        setup_fn = (KD_SETUPFN)sym;
 
         sym = dlsym(clib, KD_HOOK_SHUTDOWN_STR);
         shutdown_fn = (KD_SHUTDOWNFN)sym;
@@ -270,12 +271,15 @@ kc_application_start(
         shutdown_fn = (KD_SHUTDOWNFN)sym;
         #endif
 
+        printf("Pre howdy\n");
         if (setup_fn) {
+                printf("howdy\n");
                 setup_fn();
         }
 
         /* loop */
         while(kci_platform_process(&ctx->platform)) {
+
                 if (early_fn) {
                         early_fn();
                 }

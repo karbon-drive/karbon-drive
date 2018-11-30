@@ -54,9 +54,6 @@ typedef enum _kd_bool {
 } kd_bool;
 
 
-//extern void *ctx; /* remove */
-
-
 /* --------------------------------------------------------------- Context -- */
 
 
@@ -73,10 +70,7 @@ kd_ctx_get_exe_dir(
 
 
 typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char**, int*);
-//extern KD_CTX_GET_VENDOR_STRING_FN kd_ctx_get_vendor_string_fn;
-
 typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char**, int*);
-//extern KD_CTX_GET_EXE_DIR_FN kd_ctx_get_exe_dir_fn;
 
 
 /* ------------------------------------------------------------- Allocator -- */
@@ -104,7 +98,6 @@ kd_alloc(
 
 
 typedef int(*KD_ALLOC_FN)(void *,const struct kd_alloc_desc *desc, void ** out_addr, int *bytes);
-//extern KD_ALLOC_FN kd_alloc_fn;
 
 
 /* ---------------------------------------------------------------- Window -- */
@@ -131,11 +124,7 @@ kd_window_set(
 
 
 typedef int(*KD_WINDOW_GET_FN)(void *,struct kd_window_desc *desc);
-//extern KD_WINDOW_GET_FN kd_window_get_fn;
-
-
 typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
-//extern KD_WINDOW_SET_FN kd_window_set_fn;
 
 
 /* ----------------------------------------------------------------- Chunk -- */
@@ -176,7 +165,26 @@ kd_chunk_add(
 
 
 typedef int(*KD_CHUNK_ADD_FN)(void *, const struct kd_chunk_desc *desc, uint32_t *out_chunk_id);
-//extern KD_CHUNK_ADD_FN kd_chunk_add_fn;
+
+
+/* --------------------------------------------------------------- Logging -- */
+
+
+typedef enum _kd_log_type {
+        KD_LOG_INFO = 0,
+        KD_LOG_WARNING = 1,
+        KD_LOG_ERROR = 2,
+        KD_LOG_FATAL = 3
+} kd_log_type;
+
+
+kd_result
+kd_log(
+    kd_log_type type,
+    const char *msg);
+
+
+typedef int(*KD_LOG_FN)(void *, kd_log_type, const char *);
 
 
 /* -------------------------------------------------------------- Platform -- */
@@ -230,7 +238,7 @@ enum kd_api_hooks {
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,
         KD_FUNC_CHUNK_ADD,
-        
+        KD_FUNC_LOG,
         KD_FUNC_COUNT
 };
 

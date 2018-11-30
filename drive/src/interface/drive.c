@@ -182,6 +182,22 @@ kd_chunk_add(
 }
 
 
+/* --------------------------------------------------------------- Logging -- */
+
+
+KD_LOG_FN kd_log_fn = 0;
+
+
+kd_result
+kd_log(
+        kd_log_type type,
+        const char *msg)
+{
+        int res = kd_log_fn(ctx, type, msg);
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
 /* ---------------------------------------------------------------- Loader -- */
 
 
@@ -195,6 +211,7 @@ kd_load(void ** funcs)
         kd_window_set_fn = funcs[KD_FUNC_WINDOW_SET];
         kd_alloc_fn = funcs[KD_FUNC_ALLOC];
         kd_chunk_add_fn = funcs[KD_FUNC_CHUNK_ADD];
+        kd_log_fn = funcs[KD_FUNC_LOG];
 
         return 0;
 }

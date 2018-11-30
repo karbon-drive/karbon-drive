@@ -6,6 +6,7 @@
 #include "hooks.h"
 #include <string.h>
 #include "../fundamental.h"
+#include <stdio.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -188,4 +189,22 @@ kdi_chunk_add(
         (void)out_chunk_id;
 
         return 0;
+}
+
+
+int
+kdi_log(
+        void *ctx,
+        kd_log_type type,
+        const char *msg)
+{
+        (void)ctx;
+        (void)type;
+        (void)msg;
+
+        static const char *types[4] = {"INFO", "WARNING", "ERROR", "FATAL"}; 
+
+        printf("[%s] %s\n", types[(int)type], msg);
+
+        return 1;
 }

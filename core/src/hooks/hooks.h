@@ -3,6 +3,7 @@
 
 
 #include <stdint.h>
+#include <karbon/drive.h>
 
 
 int
@@ -41,6 +42,13 @@ kdi_chunk_add(
         void *ctx,
         const struct kd_chunk_desc *desc,
         uint32_t *out_chunk_id);
+
+
+int
+kdi_log(
+        void *ctx,
+        kd_log_type type,
+        const char *msg);
 
 
 #endif

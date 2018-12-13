@@ -17,5 +17,3 @@ renderer_dx12_destroy();
 
 #endif
 #endif
-
-

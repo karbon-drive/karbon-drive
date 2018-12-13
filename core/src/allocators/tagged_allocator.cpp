@@ -29,7 +29,7 @@ kci_tag_alloc_init(
 
 
 void
-kci_clear_tag(
+kci_tag_alloc_clear_tag(
         struct kci_tagged_allocator *allocator,
         uint64_t tag)
 {

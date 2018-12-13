@@ -40,6 +40,10 @@ fundamental_startup();
 
 
 kc_bool
+fundamental_tick();
+
+
+kc_bool
 fundamental_shutdown();
 
 

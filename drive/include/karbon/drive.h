@@ -63,6 +63,22 @@ kd_ctx_get_vendor_string(
         int *out_size);
 
 
+typedef enum _kd_graphics_api {
+        KD_GRAPHICS_API_OPENGL,
+        KD_GRAPHICS_API_DIRECT_X,
+        KD_GRAPHICS_API_METAL,
+        KD_GRAPHICS_API_VULKAN,
+} kd_graphics_api;
+
+
+kd_result
+kd_ctx_get_graphics_api(
+        kd_graphics_api *out_api,               /* required */
+        int *out_major,                         /* optional */
+        int *out_minor,                         /* optional */
+        int *out_patch);                        /* optional */
+
+
 kd_result
 kd_ctx_get_exe_dir(
         char **out_buffer,
@@ -70,6 +86,7 @@ kd_ctx_get_exe_dir(
 
 
 typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char**, int*);
+typedef int(*KD_CTX_GET_GRAPHICS_API_FN)(void*, kd_graphics_api*,int*,int*,int*);
 typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char**, int*);
 
 
@@ -125,46 +142,6 @@ kd_window_set(
 
 typedef int(*KD_WINDOW_GET_FN)(void *,struct kd_window_desc *desc);
 typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
-
-
-/* ----------------------------------------------------------------- Chunk -- */
-
-
-struct kd_buffer_data {
-        int buffer;
-        int buffer_offset;
-        int buffer_size;
-};
-
-
-struct kd_mesh_data {
-        struct kd_buffer_data geometry;
-        int geometry_type;
-        
-        struct kd_buffer_data index;
-        int index_type;
-};
-
-
-struct kd_chunk_desc {
-        kd_struct_id type_id; /* KD_STRUCT_CHUNK_DESC */
-        void * ext;
-        
-        struct kd_mesh_data *mesh_data;
-        int mesh_count;
-
-        uint8_t **buffers;
-        int buffer_count;
-};
-
-
-kd_result
-kd_chunk_add(
-        const struct kd_chunk_desc * desc,
-        uint32_t *out_chunk_id);
-
-
-typedef int(*KD_CHUNK_ADD_FN)(void *, const struct kd_chunk_desc *desc, uint32_t *out_chunk_id);
 
 
 /* --------------------------------------------------------------- Logging -- */
@@ -233,11 +210,11 @@ typedef int(*KD_LOG_FN)(void *, kd_log_type, const char *);
 enum kd_api_hooks {
         KD_PTR_CTX,
         KD_FUNC_CTX_VENDOR_STRING,
+        KD_FUNC_CTX_GRAPHICS_API,
         KD_FUNC_CTX_EXE_DIR,
         KD_FUNC_ALLOC,
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,
-        KD_FUNC_CHUNK_ADD,
         KD_FUNC_LOG,
         KD_FUNC_COUNT
 };

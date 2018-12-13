@@ -1,6 +1,10 @@
 #include "fundamental.h"
+#include "allocators/tagged_allocator.h"
 #include <stdlib.h>
 #include <string.h>
+
+
+struct kci_tagged_allocator tag_alloc;
 
 
 /* -------------------------------------------------------------- Lifetime -- */
@@ -8,7 +12,23 @@
 
 kc_bool
 fundamental_startup() {
-        return KC_FALSE;
+        kci_tag_alloc_init(&tag_alloc);
+
+        return KC_TRUE;
+}
+
+
+kc_bool
+fundamental_tick() {
+        kci_tag_alloc_clear_tag(
+                &tag_alloc,
+                KC_ALLOC_HOUSEKEEPING);
+
+        kci_tag_alloc_clear_tag(
+                &tag_alloc,
+                KC_ALLOC_RENDERER);
+
+        return KC_TRUE;
 }
 
 
@@ -20,11 +40,13 @@ fundamental_shutdown() {
 
 /* ------------------------------------------------------------ Allocation -- */
 
+
 kc_bool
 kc_alloc_frame(kc_alloc_type type, void **out_addr, int *bytes) {
-        (void)type;
-        (void)out_addr;
-        (void)bytes;
+        struct kci_tagged_memory mem = kci_tag_alloc_get(&tag_alloc, type);
+
+        *out_addr = mem.memory;
+        *bytes = mem.bytes;
 
         return KC_FALSE;
 }
@@ -67,7 +89,7 @@ _kci_arr_create_with_buffer(
                 KC_ASSERT(buffer_size);
         }
 
-        struct kc_array_header *header = buffer; 
+        struct kc_array_header *header = (struct kc_array_header*)buffer; 
         unsigned char *begin = (unsigned char*)&header[1];
 
         header[0].end = begin;
@@ -174,7 +196,7 @@ _kci_arr_resize(void **ptr, unsigned size, unsigned stride)
         struct kc_array_header *header = ((struct kc_array_header*)*ptr);
         header--;
 
-        header = _kci_arr_grow(ptr, stride, size);
+        header = (kc_array_header*)_kci_arr_grow(ptr, stride, size);
         header->end = header->capacity;
 }
 

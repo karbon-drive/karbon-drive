@@ -8,6 +8,7 @@
 #include "../fundamental.h"
 #include <stdio.h>
 
+
 #ifdef _WIN32
 #include <Windows.h>
 #elif defined(__linux__)
@@ -40,6 +41,36 @@ kdi_ctx_get_vendor_string(
                 memcpy(*out_str, vendor_string, strlen(vendor_string) + 1);
         }
         
+        return KC_OK;
+}
+
+
+int
+kdi_ctx_get_graphics_api(
+        void *ctx,
+        kd_graphics_api *out_api,
+        int *out_major,
+        int *out_minor,
+        int *out_patch)
+{
+        (void)ctx;
+
+        if (out_api) {
+                *out_api = KD_GRAPHICS_API_OPENGL;
+        }
+
+        if (out_major) {
+                *out_major = -1;
+        }
+
+        if(out_minor) {
+                *out_minor = -1;
+        }
+        
+        if(out_patch) {
+                *out_patch = -1;
+        }
+
         return KC_OK;
 }
 
@@ -174,20 +205,6 @@ kdi_window_set(
         (void)ctx;
         (void)desc;
         
-        return 0;
-}
-
-
-int
-kdi_chunk_add(
-        void *ctx,
-        const struct kd_chunk_desc *desc,
-        uint32_t *out_chunk_id)
-{
-        (void)ctx;
-        (void)desc;
-        (void)out_chunk_id;
-
         return 0;
 }
 

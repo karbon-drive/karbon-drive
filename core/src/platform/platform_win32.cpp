@@ -13,12 +13,12 @@ internal_destroy_window(
         struct kci_platform *ctx)
 {
         if (ctx->hwnd && ctx->dc) {
-                ReleaseDC(ctx->hwnd, ctx->dc);
+                ReleaseDC((HWND)ctx->hwnd, (HDC)ctx->dc);
                 ctx->dc = 0;
         }
 
         if (ctx->hwnd) {
-                DestroyWindow(ctx->hwnd);
+                DestroyWindow((HWND)ctx->hwnd);
                 ctx->hwnd = 0;
         }
 }
@@ -29,7 +29,7 @@ internal_wnd_proc(HWND hWnd, UINT u_msg, WPARAM  w_param, LPARAM  l_param)
 {
         LRESULT result = 0;
 
-        struct kci_platform *ctx = GetPropA(hWnd, "Karbon");
+        struct kci_platform *ctx = (kci_platform*)GetPropA(hWnd, "Karbon");
 
         switch (u_msg) {
         case WM_CLOSE:
@@ -123,7 +123,7 @@ kci_platform_setup(
 
         wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
         wc.lpfnWndProc = (WNDPROC)internal_wnd_proc;
-        wc.hInstance = ctx->h_instance;
+        wc.hInstance = (HINSTANCE)ctx->h_instance;
         wc.lpszClassName = "Karbon";
         wc.hCursor = LoadCursorA(0, IDC_ARROW);
         wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
@@ -159,7 +159,7 @@ kci_platform_setup(
                 rect.bottom - rect.top,
                 NULL,
                 NULL,
-                ctx->h_instance,
+                (HINSTANCE)ctx->h_instance,
                 NULL
         );
 
@@ -172,10 +172,10 @@ kci_platform_setup(
         }
 
         /* display window */
-        ShowWindow(ctx->hwnd, SW_SHOW);
-        SetForegroundWindow(ctx->hwnd);
-        SetFocus(ctx->hwnd);
-        SetPropA(ctx->hwnd, "Karbon", ctx);
+        ShowWindow((HWND)ctx->hwnd, SW_SHOW);
+        SetForegroundWindow((HWND)ctx->hwnd);
+        SetFocus((HWND)ctx->hwnd);
+        SetPropA((HWND)ctx->hwnd, "Karbon", ctx);
 }
 
 

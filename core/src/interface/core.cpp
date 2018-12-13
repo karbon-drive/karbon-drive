@@ -5,6 +5,7 @@
 
 #ifdef _WIN32
 #include "../thirdparty/dirent.h"
+#include "../renderer/renderer_dx12.h"
 #else
 #include <dirent.h>
 #endif
@@ -55,6 +56,8 @@ kc_ctx_create(
         struct kc_ctx_desc * desc,
         kc_ctx_t *out_ctx)
 {
+        fundamental_startup();
+
         struct kc_ctx *ctx = (struct kc_ctx*)malloc(sizeof(*ctx));
         
         ctx->user_data = desc->user_data;
@@ -62,6 +65,8 @@ kc_ctx_create(
         
         kci_tag_alloc_init(&ctx->allocator_tagged);
         kci_platform_setup(&ctx->platform);
+
+        renderer_dx12_create();
 
         /* setup some arrays */
         struct kci_camera *cams = 0;
@@ -152,12 +157,11 @@ kc_application_start(
         funcs[KD_FUNC_WINDOW_SET] = kdi_window_set;
         funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
         funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
-        funcs[KD_FUNC_CHUNK_ADD] = kdi_chunk_add;
         funcs[KD_FUNC_LOG] = kdi_log;
         
         /* find libs and load symbols */
         int lib_count = 0;
-        kc_lib *libs = (kc_lib)&buffer[0];
+        kc_lib *libs = (kc_lib*)&buffer[0];
         
         DIR *dir;
         struct dirent *ent;
@@ -189,7 +193,7 @@ kc_application_start(
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #else
                 kc_lib lib = (void*)LoadLibrary(str_buffer);
-                FARPROC sym = GetProcAddress(lib, KD_HOOK_LOAD_STR);
+                FARPROC sym = GetProcAddress((HMODULE)lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #endif
                 
@@ -224,7 +228,7 @@ kc_application_start(
                 void *sym = dlsym(lib, KD_HOOK_PROJECT_ENTRY_STR);
                 KD_PROJENTRYFN entry_fn = (KD_PROJENTRYFN)sym;
                 #else
-                FARPROC sym = GetProcAddress(lib, KD_HOOK_PROJECT_ENTRY_STR);
+                FARPROC sym = GetProcAddress((HMODULE)lib, KD_HOOK_PROJECT_ENTRY_STR);
                 KD_PROJENTRYFN entry_fn = (KD_PROJENTRYFN)sym;
                 #endif
                 entry_fn();
@@ -255,19 +259,19 @@ kc_application_start(
         sym = dlsym(clib, KD_HOOK_SHUTDOWN_STR);
         shutdown_fn = (KD_SHUTDOWNFN)sym;
         #elif defined(_WIN32)
-        FARPROC sym = GetProcAddress(clib, KD_HOOK_EARLY_THINK_STR);
+        FARPROC sym = GetProcAddress((HMODULE)clib, KD_HOOK_EARLY_THINK_STR);
         early_fn = (KD_EARLYTHINKFN)sym;
 
-        sym = GetProcAddress(clib, KD_HOOK_THINK_STR);
+        sym = GetProcAddress((HMODULE)clib, KD_HOOK_THINK_STR);
         think_fn = (KD_THINKFN)sym;
 
-        sym = GetProcAddress(clib, KD_HOOK_LATE_THINK_STR);
+        sym = GetProcAddress((HMODULE)clib, KD_HOOK_LATE_THINK_STR);
         late_fn = (KD_LATETHINKFN)sym;
 
-        sym = GetProcAddress(clib, KD_HOOK_SETUP_STR);
+        sym = GetProcAddress((HMODULE)clib, KD_HOOK_SETUP_STR);
         setup_fn = (KD_SETUPFN)sym;
 
-        sym = GetProcAddress(clib, KD_HOOK_SHUTDOWN_STR);
+        sym = GetProcAddress((HMODULE)clib, KD_HOOK_SHUTDOWN_STR);
         shutdown_fn = (KD_SHUTDOWNFN)sym;
         #endif
 
@@ -280,6 +284,8 @@ kc_application_start(
         /* loop */
         while(kci_platform_process(&ctx->platform)) {
 
+                fundamental_tick();
+
                 if (early_fn) {
                         early_fn();
                 }
@@ -291,6 +297,8 @@ kc_application_start(
                 if (late_fn) {
                         late_fn();
                 }
+
+                renderer_dx12_render();
         }
 
         if(shutdown_fn) {

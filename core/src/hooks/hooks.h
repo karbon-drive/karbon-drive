@@ -14,6 +14,15 @@ kdi_ctx_get_vendor_string(
 
 
 int
+kdi_ctx_get_graphics_api(
+        void *ctx,
+        kd_graphics_api *out_api,
+        int *out_major,
+        int *out_minor,
+        int *out_patch);
+
+
+int
 kdi_ctx_get_exe_dir(
         void *ctx,
         char **str,
@@ -36,13 +45,6 @@ int
 kdi_window_set(
         void *ctx,
         const struct kd_window_desc *desc);
-
-int
-kdi_chunk_add(
-        void *ctx,
-        const struct kd_chunk_desc *desc,
-        uint32_t *out_chunk_id);
-
 
 int
 kdi_log(

@@ -6,8 +6,10 @@
                         "language" : "C",
 
                         "files" : [
+                                "./**.json",
                                 "./**.h",
-                                "./**.c"
+                                "./**.hpp",
+                                "./**.cpp"
                         ],
 
                         "include_dirs" : [
@@ -26,6 +28,13 @@
                                 "dl",
                                 "X11",
                                 "vulkan"
+                        ],
+
+                        "links-windows" : [
+                                "d3d12.lib",
+                                "dxgi.lib",
+                                "d3dcompiler.lib",
+                                "dxguid.lib"
                         ]
                         
                 }

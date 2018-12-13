@@ -10,7 +10,11 @@ app_log(const char *msg) {
 
 
 int
-main() {
+main(int argc, const char **argv)
+{
+        (void)argc;
+        (void)argv;
+
         /* create and load a karbon ctx */        
         struct kc_ctx_desc ctx_desc;
         ctx_desc.type_id = KC_STRUCT_CTX_DESC;
@@ -26,7 +30,7 @@ main() {
         app_desc.type_id = KC_STRUCT_APPLICATION_DESC;
         app_desc.ext = 0;
         app_desc.load_directory = "./";
-        kc_application_start(kc_ctx, &app_desc);        
+        kc_application_start(kc_ctx, &app_desc);
 
         return 0;
 }

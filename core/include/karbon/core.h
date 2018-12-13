@@ -5,6 +5,11 @@
 #include <karbon/drive.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* ------------------------------------------------- Types and Identifiers -- */
 
 
@@ -28,6 +33,7 @@ typedef enum kc_struct_id {
 
 typedef struct kc_ctx * kc_ctx_t;
 typedef void(*KC_LOG_FN)(const char*);
+
 
 struct kc_ctx_desc {
         kc_struct_id type_id;
@@ -66,6 +72,11 @@ kc_result
 kc_application_start(
         kc_ctx_t ctx,
         const struct kc_application_desc * desc);
+
+
+#ifdef __cplusplus
+} /* extern */
+#endif
 
 
 /* inc guard */

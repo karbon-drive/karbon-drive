@@ -1,11 +1,13 @@
 #ifdef _WIN32
 #include <Windows.h>
+#include <assert.h>
 #include "platform.h"
 
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "opengl32.lib")
 
 
 static void
@@ -149,7 +151,7 @@ kci_platform_setup(
         AdjustWindowRectEx(&rect, dw_style, FALSE, dw_ex_style);
 
         /* create window */
-        ctx->hwnd = CreateWindowExA(
+        HWND hwnd = CreateWindowExA(
                 dw_ex_style,
                 wc.lpszClassName,
                 "KarbonDrive",
@@ -160,16 +162,58 @@ kci_platform_setup(
                 NULL,
                 NULL,
                 (HINSTANCE)ctx->h_instance,
-                NULL
-        );
+                NULL);
 
-        if (!ctx->hwnd) {
+        if (!hwnd) {
+                assert(!"KD - Failed to create Window");
                 return 0;
         }
 
-        if (ctx->hwnd) {
-                int i;
+        HDC dc = GetDC(hwnd);
+
+        /* create gl */
+        PIXELFORMATDESCRIPTOR pfd{};
+        pfd.nSize = sizeof(pfd);
+        pfd.nVersion = 1;
+        pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+        pfd.iPixelType = PFD_TYPE_RGBA;
+        pfd.cColorBits = 32;
+        pfd.cDepthBits = 24;
+        pfd.cStencilBits = 8;
+        pfd.iLayerType = PFD_MAIN_PLANE;
+
+        INT pfi = ChoosePixelFormat(dc, &pfd);
+
+        if (pfi == 0) {
+                assert(!"KD - Failed to create Pixel format for OGL");
+                return 0;
         }
+
+        BOOL pfs = SetPixelFormat(dc, pfi, &pfd);
+
+        if (pfs = FALSE) {
+                assert(!"KD - Failed to set Pixel format for OGL");
+                return 0;
+        }
+
+        HGLRC glrc = wglCreateContext(dc);
+
+        if (!glrc) {
+                assert(!"KD - Failed to create OGL context");
+                return 0;
+        }
+
+        BOOL curr = wglMakeCurrent(dc, glrc);
+
+        if (curr == FALSE) {
+                assert(!"KD - Failed to make current");
+                return 0;
+        }
+
+        /* save info */
+        ctx->hwnd = (void*)hwnd;
+        ctx->dc = (void*)dc;
+        ctx->glrc = (void*)glrc;
 
         /* display window */
         ShowWindow((HWND)ctx->hwnd, SW_SHOW);
@@ -197,7 +241,7 @@ kci_platform_process(
                 }
         }
 
-        //SwapBuffers(plat->dc);
+        SwapBuffers((HDC)plat->dc);
 
         return plat->hwnd ? 1 : 0;
 }

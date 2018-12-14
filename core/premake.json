@@ -34,7 +34,8 @@
                                 "d3d12.lib",
                                 "dxgi.lib",
                                 "d3dcompiler.lib",
-                                "dxguid.lib"
+                                "dxguid.lib",
+                                "opengl32.lib"
                         ]
                         
                 }

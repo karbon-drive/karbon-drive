@@ -18,7 +18,6 @@ struct kci_ctx_fn {
         KD_WINDOW_GET_FN win_get;
         KD_WINDOW_SET_FN win_set;
         KD_ALLOC_FN alloc;
-
 };
 
 
@@ -38,39 +37,6 @@ struct kci_applications {
 };
 
 
-/* ----------------------------------------------------------------- Chunk -- */
-
-
-struct kci_chunk {
-        int i;
-};
-
-
-
-/* -------------------------------------------------------------- Renderer -- */
-
-
-struct kci_rdr_chunk {
-        int i;
-};
-
-
-struct kci_camera {
-        int i;
-};
-
-
-#define KCI_MAX_CAMERA 4
-#define KCI_MAX_CHUNKS 32
-
-
-struct kci_rdr {
-        /* array */ struct kci_camera *cameras;
-        /* array */ struct kci_rdr_chunk *chunks;
-        /* array */ struct kci_rdr_chunk **pending_chunks;
-};
-
-
 /* --------------------------------------------------------------- Context -- */
 
 
@@ -84,8 +50,6 @@ struct kc_ctx {
         struct kci_platform platform;
         
         void *user_data;
-
-        struct kci_rdr rdr_data;
 };
 
 #endif

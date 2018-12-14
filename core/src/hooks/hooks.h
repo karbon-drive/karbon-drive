@@ -6,10 +6,13 @@
 #include <karbon/drive.h>
 
 
+extern "C" {
+
+
 int
 kdi_ctx_get_vendor_string(
         void *ctx,
-        char **str,
+        char *str,
         int *len);
 
 
@@ -51,6 +54,9 @@ kdi_log(
         void *ctx,
         kd_log_type type,
         const char *msg);
+
+
+}
 
 
 #endif

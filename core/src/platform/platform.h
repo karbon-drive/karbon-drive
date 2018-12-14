@@ -1,6 +1,7 @@
 #ifndef WINDOW_INCLUDED
 #define WINDOW_INCLUDED
 
+
 #if defined(__linux__)
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -13,6 +14,7 @@ struct kci_platform {
         void *h_instance;
         void *hwnd;
         void *dc;
+        void *glrc;
 
         int width;
         int height;

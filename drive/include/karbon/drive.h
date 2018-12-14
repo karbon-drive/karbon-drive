@@ -2,6 +2,21 @@
 #define KARBON_DRIVE
 
 
+#ifdef _WIN32
+#define KD_EXPORT __declspec(dllexport)
+#define KD_CALL __cdecl 
+#ifdef __cplusplus
+#define KD_API extern "C"
+#else
+#define KD_API
+#endif
+#else
+#define KD_API extern "C"
+#define KD_EXPORT
+#define KD_CALL
+#endif
+
+
 /* ------------------------------------------------- Types and Identifiers -- */
 
 
@@ -59,7 +74,7 @@ typedef enum _kd_bool {
 
 kd_result
 kd_ctx_get_vendor_string(
-        char **out_buffer,
+        char *out_buffer,
         int *out_size);
 
 
@@ -85,7 +100,7 @@ kd_ctx_get_exe_dir(
         int *out_size);
 
 
-typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char**, int*);
+typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char*, int*);
 typedef int(*KD_CTX_GET_GRAPHICS_API_FN)(void*, kd_graphics_api*,int*,int*,int*);
 typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char**, int*);
 
@@ -144,6 +159,16 @@ typedef int(*KD_WINDOW_GET_FN)(void *,struct kd_window_desc *desc);
 typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
 
 
+/* --------------------------------------------------------------- Open GL -- */
+
+
+kd_result
+kd_gl_make_current();
+
+
+typedef int(*KD_GL_MAKE_CURRENT)(void *);
+
+
 /* --------------------------------------------------------------- Logging -- */
 
 
@@ -197,16 +222,6 @@ typedef int(*KD_LOG_FN)(void *, kd_log_type, const char *);
 /* ---------------------------------------------------------------- Loader -- */
 
 
-#ifdef _WIN32
-#define KD_EXPORT __declspec(dllexport)
-#define KD_API extern "C"
-//#pragma comment(linker, "/export:kd_load=_kd_load")
-#else
-#define KD_API extern "C"
-#define KD_EXPORT
-#endif
-
-
 enum kd_api_hooks {
         KD_PTR_CTX,
         KD_FUNC_CTX_VENDOR_STRING,
@@ -220,7 +235,7 @@ enum kd_api_hooks {
 };
 
 
-KD_EXPORT int
+KD_API KD_EXPORT int KD_CALL
 kd_load(void ** funcs);
 
 

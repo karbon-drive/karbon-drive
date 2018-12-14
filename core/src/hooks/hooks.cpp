@@ -17,28 +17,35 @@
 #endif
 
 
+
+extern "C" {
+
+
 int
 kdi_ctx_get_vendor_string(
         void *ctx,
-        char **out_str,
+        char *out_str,
         int *out_size)
 {
         (void)ctx;
         
         #if defined(__APPLE__)
-        const char *vendor_string = "ROA(macOS)";
+        const char *vendor_str = "ROA(macOS)";
         #elif defined(_WIN32)
-        const char *vendor_string = "ROA(Windows)";
+        const char *vendor_str = "ROA(Windows)";
         #elif defined(__linux__)
-        const char *vendor_string = "ROA(Linux)";
+        const char *vendor_str = "ROA(Linux)";
         #endif
         
         if(out_size) {
-                *out_size = (int)strlen(vendor_string) + 1;
+                *out_size = (int)strlen(vendor_str) + 1;
         }
         
         if(out_str) {
-                memcpy(*out_str, vendor_string, strlen(vendor_string) + 1);
+                void *dst = (void*)out_str;
+                void *src = (void*)vendor_str;
+                unsigned len = strlen(vendor_str) + 1;
+                memcpy(dst, src, len);
         }
         
         return KC_OK;
@@ -225,3 +232,6 @@ kdi_log(
 
         return 1;
 }
+
+
+} /* extern C */

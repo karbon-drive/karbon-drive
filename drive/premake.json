@@ -3,7 +3,7 @@
                 {
                         "name" : "karbon_drive",
                         "kind" : "StaticLib",
-                        "language" : "C",
+                        "language" : "C++",
 
                         "include_dirs_public" : [
                                 "./include/"
@@ -12,7 +12,8 @@
                         "files" : [
                                 "./**.json",
                                 "./**.h",
-                                "./**.c"
+                                "./**.hpp",
+                                "./**.cpp"
                         ]
                 }
         ]

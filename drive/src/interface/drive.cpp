@@ -2,6 +2,9 @@
 #include "../config.h"
 
 
+extern "C" {
+
+
 void *ctx = 0;
 
 
@@ -13,7 +16,7 @@ KD_CTX_GET_VENDOR_STRING_FN kd_ctx_get_vendor_string_fn = 0;
 
 kd_result
 kd_ctx_get_vendor_string(
-        char **out_buffer,
+        char *out_buffer,
         int *out_size)
 {
         if(KD_PCHECK && !ctx) {
@@ -51,7 +54,7 @@ kd_ctx_get_graphics_api(
                 return KD_RESULT_INVALID_PARAM;
         }
 
-        int res = kd_ctx_get_graphics_api(ctx, out_api, out_major, out_minor, out_patch);
+        int res = kd_ctx_get_graphics_api_fn(ctx, out_api, out_major, out_minor, out_patch);
 
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
@@ -198,14 +201,21 @@ kd_log(
 int
 kd_load(void ** funcs)
 {
-        ctx = funcs[KD_PTR_CTX];
-        kd_ctx_get_vendor_string_fn = funcs[KD_FUNC_CTX_VENDOR_STRING];
-        kd_ctx_get_graphics_api_fn = funcs[KD_FUNC_CTX_GRAPHICS_API];
-        kd_ctx_get_exe_dir_fn = funcs[KD_FUNC_CTX_EXE_DIR];
-        kd_window_get_fn = funcs[KD_FUNC_WINDOW_GET];
-        kd_window_set_fn = funcs[KD_FUNC_WINDOW_SET];
-        kd_alloc_fn = funcs[KD_FUNC_ALLOC];
-        kd_log_fn = funcs[KD_FUNC_LOG];
+        if (!funcs) {
+                return 0;
+        }
 
-        return 0;
+        ctx = funcs[KD_PTR_CTX];
+        kd_ctx_get_vendor_string_fn = (KD_CTX_GET_VENDOR_STRING_FN)funcs[KD_FUNC_CTX_VENDOR_STRING];
+        kd_ctx_get_graphics_api_fn = (KD_CTX_GET_GRAPHICS_API_FN)funcs[KD_FUNC_CTX_GRAPHICS_API];
+        kd_ctx_get_exe_dir_fn = (KD_CTX_GET_EXE_DIR_FN)funcs[KD_FUNC_CTX_EXE_DIR];
+        kd_window_get_fn = (KD_WINDOW_GET_FN)funcs[KD_FUNC_WINDOW_GET];
+        kd_window_set_fn = (KD_WINDOW_SET_FN)funcs[KD_FUNC_WINDOW_SET];
+        kd_alloc_fn = (KD_ALLOC_FN)funcs[KD_FUNC_ALLOC];
+        kd_log_fn = (KD_LOG_FN)funcs[KD_FUNC_LOG];
+
+        return 1;
 }
+
+
+} /* extern C */

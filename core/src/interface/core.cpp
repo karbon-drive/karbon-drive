@@ -65,22 +65,7 @@ kc_ctx_create(
         
         kci_tag_alloc_init(&ctx->allocator_tagged);
         kci_platform_setup(&ctx->platform);
-
-        renderer_dx12_create();
-
-        /* setup some arrays */
-        struct kci_camera *cams = 0;
-        kc_array_create_with_capacity(cams, KCI_MAX_CAMERA);
-        ctx->rdr_data.cameras = cams;
-
-        struct kci_rdr_chunk *chunks = 0;
-        kc_array_create_with_capacity(chunks, KCI_MAX_CHUNKS);
-        ctx->rdr_data.chunks = chunks;
-
-        struct kci_rdr_chunk **pending_chunks = 0;
-        kc_array_create_with_capacity(pending_chunks, KCI_MAX_CHUNKS);
-        ctx->rdr_data.pending_chunks = pending_chunks;
-        
+       
         *out_ctx = ctx;
 
         ctx->log_fn("Karbon CTX created");

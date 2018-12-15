@@ -17,10 +17,6 @@
 #endif
 
 
-
-extern "C" {
-
-
 int
 kdi_ctx_get_vendor_string(
         void *ctx,
@@ -48,7 +44,7 @@ kdi_ctx_get_vendor_string(
                 memcpy(dst, src, len);
         }
         
-        return KC_OK;
+        return 1;
 }
 
 
@@ -78,7 +74,7 @@ kdi_ctx_get_graphics_api(
                 *out_patch = -1;
         }
 
-        return KC_OK;
+        return 1;
 }
 
 
@@ -169,7 +165,7 @@ kdi_ctx_get_exe_dir(
                 memcpy(*out_str, buf_path, strlen(buf_path) + 1);
         }
 
-        return KC_OK;
+        return 1;
 }
 
 
@@ -233,5 +229,3 @@ kdi_log(
         return 1;
 }
 
-
-} /* extern C */

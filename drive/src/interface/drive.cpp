@@ -28,6 +28,11 @@ kd_ctx_get_vendor_string(
                 KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
                 return KD_RESULT_INVALID_PARAM;
         }
+
+        if (KD_PCHECK && !kd_ctx_get_vendor_string_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
         
         int res = kd_ctx_get_vendor_string_fn(ctx, out_buffer, out_size);
         
@@ -54,6 +59,11 @@ kd_ctx_get_graphics_api(
                 return KD_RESULT_INVALID_PARAM;
         }
 
+        if (KD_PCHECK && !kd_ctx_get_graphics_api_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
+
         int res = kd_ctx_get_graphics_api_fn(ctx, out_api, out_major, out_minor, out_patch);
 
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
@@ -76,6 +86,11 @@ kd_ctx_get_exe_dir(
         if(KD_PCHECK && (!out_buffer && !out_size)) {
                 KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
                 return KD_RESULT_INVALID_PARAM;
+        }
+
+        if (KD_PCHECK && !kd_ctx_get_exe_dir_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
         }
 
         int res = kd_ctx_get_exe_dir_fn(ctx, out_buffer, out_size);
@@ -115,6 +130,11 @@ kd_alloc(
                 KD_ASSERT(!"KD_RESULT_INVALID_DESC");
                 return KD_RESULT_INVALID_DESC;
         }
+
+        if (KD_PCHECK && !kd_alloc_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
         
         int res = kd_alloc_fn(ctx, desc, out_addr, bytes);
         
@@ -147,6 +167,11 @@ kd_window_get(
                 return KD_RESULT_INVALID_DESC;
         }
 
+        if (KD_PCHECK && !kd_window_get_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
+
         int res = kd_window_get_fn(ctx, desc);
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
@@ -174,7 +199,42 @@ kd_window_set(
                 return KD_RESULT_INVALID_DESC;
         }
 
+        if (KD_PCHECK && !kd_window_set_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
+
         int res = kd_window_set_fn(ctx, desc);
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
+/* ----------------------------------------------------------------- Input -- */
+
+
+KD_INPUT_GET_KEYBOARDS_FN kd_input_get_keyboards_fn = 0;
+
+
+kd_result
+kd_input_get_keyboards(
+        struct kd_keyboard_desc *out_desc)
+{
+        if (KD_PCHECK && !ctx) {
+                KD_ASSERT(!"KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if (KD_PCHECK && !out_desc) {
+                KD_ASSERT(!"KD_RESUILT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        if (KD_PCHECK && !kd_input_get_keyboards) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
+
+        int res = kd_input_get_keyboards_fn(ctx, out_desc);
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
 
@@ -190,6 +250,16 @@ kd_log(
         kd_log_type type,
         const char *msg)
 {
+        if (KD_PCHECK && !ctx) {
+                KD_ASSERT(!"KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if (KD_PCHECK && !kd_log_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLENTATION");
+                return KD_RESULT_NO_IMPLENTATION;
+        }
+
         int res = kd_log_fn(ctx, type, msg);
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }

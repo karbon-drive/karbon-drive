@@ -47,9 +47,10 @@ extern "C" {
 
 
 typedef enum _kd_result {
-  KD_RESULT_OK,
+        KD_RESULT_OK,
         KD_RESULT_FAIL,
         KD_RESULT_CORRUPTED,
+        KD_RESULT_NO_IMPLENTATION,
         KD_RESULT_INVALID_PARAM,
         KD_RESULT_INVALID_DESC,
 } kd_result;
@@ -157,6 +158,59 @@ kd_window_set(
 
 typedef int(*KD_WINDOW_GET_FN)(void *,struct kd_window_desc *desc);
 typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
+
+
+/* ----------------------------------------------------------------- Input -- */
+
+
+typedef enum _kd_key_state {
+        KD_KEY_UP = 0,
+        KD_KEY_UP_EVENT = 1,
+        KD_KEY_DOWN = 2,
+        KD_KEY_DOWN_EVENT = 3,
+} kd_key_state;
+
+
+typedef enum _kd_kb_key {
+        /* num row */
+        KD_KB_1, KD_KB_2, KD_KB_3, KD_KB_4, KD_KB_5, KD_KB_6, KD_KB_7, KD_KB_8,
+        KD_KB_9, KD_KB_0, KD_KB_PLUS, KD_KB_MINUS, KD_KB_BACKSPACE, KD_KB_TILDA,
+
+        /* alpha */
+        KD_KB_A, KD_KB_B, KD_KB_C, KD_KB_D, KD_KB_E, KD_KB_F, KD_KB_G, KD_KB_H,
+        KD_KB_I, KD_KB_J, KD_KB_K, KD_KB_L, KD_KB_M, KD_KB_N, KD_KB_O, KD_KB_P,
+        KD_KB_Q, KD_KB_R, KD_KB_S, KD_KB_T, KD_KB_U, KD_KB_V, KD_KB_W, KD_KB_X,
+        KD_KB_Y, KD_KB_Z,
+
+        /* func row */
+        KD_KB_F1, KD_KB_F2, KD_KB_F3, KD_KB_F4, KD_KB_F5, KD_KB_F6, KD_KB_F7,
+        KD_KB_F8, KD_KB_F9, KD_KB_F10, KD_KB_F11, KD_KB_F12, KD_KB_ESC,
+
+        /* punct and mod keys */
+        KD_KB_TAB, KD_KB_CAPS, KD_KB_LSHIFT, KD_KB_RSHIFT, KD_KB_LCTRL,
+        KD_KB_RCTRL, KD_KB_SPACE, KD_KB_LALT, KD_KB_RALT, KD_KB_PERIOD,
+        KD_KB_COMMA,
+
+        /* dir */
+        KD_KB_UP, KD_KB_DOWN, KD_KB_LEFT, KD_KB_RIGHT,
+
+        /* key count */
+        KD_KB_COUNT
+};
+
+
+struct kd_keyboard_desc {
+        uint8_t **kb_state;
+        int kb_count;
+};
+
+
+kd_result
+kd_input_get_keyboards(
+        struct kd_keyboard_desc *out_desc);
+
+
+typedef int(*KD_INPUT_GET_KEYBOARDS_FN)(void*,struct kd_keyboard_desc*desc);
 
 
 /* --------------------------------------------------------------- Open GL -- */

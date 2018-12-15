@@ -254,7 +254,7 @@ int
 kci_platform_opengl_make_current(
         struct kci_platform *plat)
 {
-        BOOL curr = wglMakeCurrent(dc, glrc);
+        BOOL curr = wglMakeCurrent((HDC)plat->dc, (HGLRC)plat->glrc);
         return curr == TRUE ? 1 : 0;
 }
 

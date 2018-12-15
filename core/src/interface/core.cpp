@@ -245,14 +245,17 @@ kc_application_start(
         shutdownhook_fn ? shutdown_fn = shutdownhook_fn() : shutdown_fn = 0;
         
         #elif defined(_WIN32)
-        sym = GetProcAddress((HMODULE)clib, KD_HOOK_THINK_STR);
-        tick_fn = (KD_TICKFN)sym;
+        sym = GetProcAddress((HMODULE)clib, KD_HOOK_TICK_STR);
+        KD_TICKHOOKFN tickhook_fn = (KD_TICKHOOKFN)sym;
+        tickhook_fn ? tick_fn = tickhook_fn() : tick_fn = 0;
 
-        sym = GetProcAddress((HMODULE)clib, KD_HOOK_SETUP_STR);
-        setup_fn = (KD_STARTUPFN)sym;
+        sym = GetProcAddress((HMODULE)clib, KD_HOOK_STARTUP_STR);
+        KD_STARTUPHOOKFN setuphook_fn = (KD_STARTUPHOOKFN)sym;
+        setuphook_fn ? setup_fn = setuphook_fn() : setup_fn = 0;
 
         sym = GetProcAddress((HMODULE)clib, KD_HOOK_SHUTDOWN_STR);
-        shutdown_fn = (KD_SHUTDOWNFN)sym;
+        KD_SHUTDOWNHOOKFN shutdownhook_fn = (KD_SHUTDOWNHOOKFN)sym;
+        shutdownhook_fn ? shutdown_fn = shutdownhook_fn() : shutdown_fn = 0;
         #endif
 
         if(KC_EXTRA_LOGGING) {

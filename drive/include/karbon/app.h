@@ -39,12 +39,12 @@
 
 #define KD_APP_TICK_FN(tick_fn) \
         KD_API KD_EXPORT KD_TICKFN \
-        kd_app_startup() { return tick_fn; } \
+        kd_app_tick() { return tick_fn; } \
 
 
 #define KD_APP_SHUTDOWN_FN(shutdown_fn) \
         KD_API KD_EXPORT KD_SHUTDOWNFN \
-        kd_app_startup() { return shutdown_fn; } \
+        kd_app_shutdown() { return shutdown_fn; } \
 
 
 #endif

@@ -3,13 +3,20 @@
                 {
                         "name" : "karbon_core",
                         "kind" : "ConsoleApp",
-                        "language" : "C",
+                        "language" : "C++",
 
                         "files" : [
                                 "./**.json",
                                 "./**.h",
                                 "./**.hpp",
                                 "./**.cpp"
+                        ],
+
+                        "files-macosx" : [
+                                "./**.mm",
+                                "./**.h",
+                                "./**.m",
+                                "./**.storyboard"
                         ],
 
                         "include_dirs" : [
@@ -36,6 +43,11 @@
                                 "d3dcompiler.lib",
                                 "dxguid.lib",
                                 "opengl32.lib"
+                        ],
+
+                        "links-macosx" : [
+                                "Metal.framework",
+                                "Cocoa.framework"
                         ]
                         
                 }

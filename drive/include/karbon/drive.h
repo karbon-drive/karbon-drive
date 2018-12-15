@@ -50,7 +50,7 @@ typedef enum _kd_result {
         KD_RESULT_OK,
         KD_RESULT_FAIL,
         KD_RESULT_CORRUPTED,
-        KD_RESULT_NO_IMPLENTATION,
+        KD_RESULT_NO_IMPLEMENTATION,
         KD_RESULT_INVALID_PARAM,
         KD_RESULT_INVALID_DESC,
 } kd_result;
@@ -68,6 +68,9 @@ typedef enum _kd_bool {
         KD_FALSE = 0,
         KD_TRUE = 1,
 } kd_bool;
+
+
+typedef void(*KD_HOOK_FN)();
 
 
 /* --------------------------------------------------------------- Context -- */
@@ -196,7 +199,7 @@ typedef enum _kd_kb_key {
 
         /* key count */
         KD_KB_COUNT
-};
+} kd_kb_key;
 
 
 struct kd_keyboard_desc {
@@ -284,6 +287,8 @@ enum kd_api_hooks {
         KD_FUNC_ALLOC,
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,
+        KD_FUNC_INPUT_KEYBOARD_GET,
+        KD_FUNC_OPENGL_MAKE_CURRENT,
         KD_FUNC_LOG,
         KD_FUNC_COUNT
 };
@@ -299,23 +304,17 @@ kd_load(void ** funcs);
 #define KD_HOOK_LOAD_STR "kd_load"
 typedef int(*KD_LOAD_FN)(void**);
 
-#define KD_HOOK_PROJECT_ENTRY_STR "kd_project_entry"
-typedef void(*KD_PROJENTRYFN)();
+#define KD_HOOK_STARTUP_STR "kd_app_startup"
+typedef void(*KD_STARTUPFN)();
+typedef KD_STARTUPFN(*KD_STARTUPHOOKFN)();
 
-#define KD_HOOK_SETUP_STR "kd_setup"
-typedef void(*KD_SETUPFN)();
-
-#define KD_HOOK_SHUTDOWN_STR "kd_shutdown"
+#define KD_HOOK_SHUTDOWN_STR "kd_app_shutdown"
 typedef void(*KD_SHUTDOWNFN)();
+typedef KD_SHUTDOWNFN(*KD_SHUTDOWNHOOKFN)();
 
-#define KD_HOOK_EARLY_THINK_STR "kd_early_think"
-typedef void(*KD_EARLYTHINKFN)();
-
-#define KD_HOOK_THINK_STR "kd_think"
-typedef void(*KD_THINKFN)();
-
-#define KD_HOOK_LATE_THINK_STR "kd_late_think"
-typedef void(*KD_LATETHINKFN)();
+#define KD_HOOK_TICK_STR "kd_app_tick"
+typedef void(*KD_TICKFN)();
+typedef KD_TICKFN(*KD_TICKHOOKFN)();
 
 
 #ifdef __cplusplus

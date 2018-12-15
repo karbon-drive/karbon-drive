@@ -74,6 +74,16 @@ kci_platform_destroy(
 }
 
 
+/* --------------------------------------------------------------- Open GL -- */
+
+
+int
+kci_platform_opengl_make_current(
+        struct kci_platform *plat)
+{
+        return 0;
+}
+
 
 /* linux */
 #endif

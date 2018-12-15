@@ -17,4 +17,13 @@
 #endif
 
 
+#ifndef KC_EXTRA_LOGGING
+        #ifndef NDEBUG
+                #define KC_EXTRA_LOGGING 1
+        #else
+                #define KC_EXTRA_LOGGING 0
+        #endif
+#endif
+
+
 #endif

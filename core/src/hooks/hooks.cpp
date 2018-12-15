@@ -14,7 +14,14 @@
 #elif defined(__linux__)
 #include <unistd.h>
 #include <libgen.h>
+#elif defined(__APPLE__)
+#include <unistd.h>
+#include <libgen.h>
+#include <libproc.h>
 #endif
+
+
+/* --------------------------------------------------------------- Context -- */
 
 
 int
@@ -169,6 +176,9 @@ kdi_ctx_get_exe_dir(
 }
 
 
+/* ------------------------------------------------------------- Allocator -- */
+
+
 int
 kdi_alloc_tagged(
         void *ctx,
@@ -187,6 +197,9 @@ kdi_alloc_tagged(
         
         return 1;
 }
+
+
+/* ---------------------------------------------------------------- Window -- */
 
 
 int
@@ -210,6 +223,25 @@ kdi_window_set(
         
         return 0;
 }
+
+
+/* ----------------------------------------------------------------- Input -- */
+
+
+/* --------------------------------------------------------------- Open GL -- */
+
+
+int
+kdi_gl_make_current(
+        void *ctx)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+
+        return kci_platform_opengl_make_current(&core_ctx->platform);
+}
+
+
+/* --------------------------------------------------------------- Logging -- */
 
 
 int

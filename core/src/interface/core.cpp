@@ -1,7 +1,10 @@
 #include <karbon/core.h>
 #include "../fundamental.h"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
+#include <string>
+#include <vector>
+#include "../config.h"
 
 #ifdef _WIN32
 #include "../thirdparty/dirent.h"
@@ -44,7 +47,6 @@ kci_alloc_housekeeping(struct kc_ctx *ctx, void **addr, int *bytes) {
 void
 kci_log_stub(const char *msg) {
         (void)msg;
-        /* no user log fn */
 }
 
 
@@ -58,7 +60,7 @@ kc_ctx_create(
 {
         fundamental_startup();
 
-        struct kc_ctx *ctx = (struct kc_ctx*)malloc(sizeof(*ctx));
+        struct kc_ctx *ctx = new kc_ctx{};
         
         ctx->user_data = desc->user_data;
         ctx->log_fn = desc->log_fn ? desc->log_fn : kci_log_stub;
@@ -115,7 +117,9 @@ kc_application_start(
 {
         (void)desc;
 
-        ctx->log_fn("Karbon Starting up... ");
+        if(KC_EXTRA_LOGGING) {
+                ctx->log_fn("Karbon Core Startup... ");
+        }
 
         void *addr = 0; int bytes = 0;
         kci_alloc_housekeeping(ctx, &addr, &bytes);
@@ -137,12 +141,15 @@ kc_application_start(
         /* symbols to load */
         void * funcs[KD_FUNC_COUNT];
         funcs[KD_PTR_CTX] = (void*)ctx;
-        funcs[KD_FUNC_CTX_VENDOR_STRING] = kdi_ctx_get_vendor_string;
-        funcs[KD_FUNC_CTX_EXE_DIR] = kdi_ctx_get_exe_dir;
-        funcs[KD_FUNC_WINDOW_SET] = kdi_window_set;
-        funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
-        funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
-        funcs[KD_FUNC_LOG] = kdi_log;
+        funcs[KD_FUNC_CTX_VENDOR_STRING] = (void*)kdi_ctx_get_vendor_string;
+        funcs[KD_FUNC_CTX_GRAPHICS_API] = nullptr;
+        funcs[KD_FUNC_CTX_EXE_DIR] = (void*)kdi_ctx_get_exe_dir;
+        funcs[KD_FUNC_ALLOC] = (void*)kdi_alloc_tagged;
+        funcs[KD_FUNC_WINDOW_GET] = (void*)kdi_window_get;
+        funcs[KD_FUNC_WINDOW_SET] = (void*)kdi_window_set;
+        funcs[KD_FUNC_INPUT_KEYBOARD_GET] = nullptr;
+        funcs[KD_FUNC_OPENGL_MAKE_CURRENT] = (void*)kdi_gl_make_current;
+        funcs[KD_FUNC_LOG] = (void*)kdi_log;
         
         /* find libs and load symbols */
         int lib_count = 0;
@@ -162,107 +169,97 @@ kc_application_start(
         #elif defined(__linux__)
         const char *ext = ".so";
         #endif
-
+        
+        std::vector<kc_lib> loaded_libs;
+        loaded_libs.reserve(32);
+        
         while ((ent = readdir (dir)) != NULL) {
-                if(!kci_str_ends_with(ent->d_name, ext)) {
+                std::string item_name = ent->d_name;
+                
+                /* check if file ends with extension */
+                if(!kci_str_ends_with(item_name.c_str(), ext)) {
+                        if(KC_EXTRA_LOGGING) {
+                                std::string msg = "- Ignore " + item_name;
+                                ctx->log_fn(msg.c_str());
+                        }
+                
                         continue;
                 }
 
-                char str_buffer[2 << 11] = {0};
-                strcat(str_buffer, base_dir);
-                strcat(str_buffer, ent->d_name);
+                /* try load */
+                std::string path = base_dir;
+                path += item_name;
                 
                 #ifndef _WIN32
-                kc_lib lib =  dlopen(str_buffer, RTLD_NOW);
+                kc_lib lib =  dlopen(item_name.c_str(), RTLD_NOW);
                 void *sym = dlsym(lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #else
-                kc_lib lib = (void*)LoadLibrary(str_buffer);
+                kc_lib lib = (void*)LoadLibrary(item_name.c_str());
                 FARPROC sym = GetProcAddress((HMODULE)lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #endif
                 
                 if(lib && load_fn) {
-                        ctx->log_fn(&str_buffer[0]);
-
-                        load_fn(funcs);
-                        libs[lib_count++] = lib;
+                        if(KC_EXTRA_LOGGING) {
+                                std::string msg = " - Loaded " + item_name;
+                                ctx->log_fn(msg.c_str());
+                        }
+                        
+                        if(load_fn(funcs)) {
+                                loaded_libs.emplace_back(lib);
+                        }
                 }
         }
         
-        buffer += (sizeof(kc_lib) * lib_count);
-        bytes -= (sizeof(kc_lib) * lib_count);
-        
-        /* copy libs out of frame buffer */
-        int lib_bytes = sizeof(kc_lib) * lib_count;
+        /* copy libs out */
+        int lib_bytes = sizeof(kc_lib) * loaded_libs.size();
 
         kc_lib *lib_arr = 0;
         kc_array_create_with_capacity(lib_arr, lib_count);
         kc_array_resize(lib_arr, lib_count);
-        memcpy(lib_arr, libs, lib_bytes);
+        memcpy(lib_arr, loaded_libs.data(), lib_bytes);
 
         ctx->apps.libs = lib_arr;
-        
-        /* call project entry on libs */
-        int i;
-        
-        for(i = 0; i < lib_count; ++i) {
-                kc_lib lib = ctx->apps.libs[i];
-        
-                #ifndef _WIN32
-                void *sym = dlsym(lib, KD_HOOK_PROJECT_ENTRY_STR);
-                KD_PROJENTRYFN entry_fn = (KD_PROJENTRYFN)sym;
-                #else
-                FARPROC sym = GetProcAddress((HMODULE)lib, KD_HOOK_PROJECT_ENTRY_STR);
-                KD_PROJENTRYFN entry_fn = (KD_PROJENTRYFN)sym;
-                #endif
-                entry_fn();
-        }
 
         /* get tick funcs */
-        KD_EARLYTHINKFN early_fn = 0;
-        KD_THINKFN think_fn = 0;
-        KD_LATETHINKFN late_fn = 0;
-        KD_SETUPFN setup_fn = 0;
+        KD_TICKFN tick_fn = 0;
+        KD_STARTUPFN setup_fn = 0;
         KD_SHUTDOWNFN shutdown_fn = 0;
 
-        void *clib = ctx->apps.libs[0];
+//        void *clib = ctx->apps.libs[0]; /* bug */
+        void *clib = loaded_libs[0];
+        void *sym;
+        
+        #if defined(__linux__) || defined(__APPLE__)
+        sym = dlsym(clib, KD_HOOK_TICK_STR);
+        KD_TICKHOOKFN tickhook_fn = (KD_TICKHOOKFN)sym;
+        tickhook_fn ? tick_fn = tickhook_fn() : tick_fn = 0;
 
-        #if defined(__linux__)
-        void *sym = dlsym(clib, KD_HOOK_EARLY_THINK_STR);
-        early_fn = (KD_EARLYTHINKFN)sym;
-
-        sym = dlsym(clib, KD_HOOK_THINK_STR);
-        think_fn = (KD_THINKFN)sym;
-
-        sym = dlsym(clib, KD_HOOK_LATE_THINK_STR);
-        late_fn = (KD_LATETHINKFN)sym;
-
-        sym = dlsym(clib, KD_HOOK_SETUP_STR);
-        setup_fn = (KD_SETUPFN)sym;
+        sym = dlsym(clib, KD_HOOK_STARTUP_STR);
+        KD_STARTUPHOOKFN setuphook_fn = (KD_STARTUPHOOKFN)sym;
+        setuphook_fn ? setup_fn = setuphook_fn() : setup_fn = 0;
 
         sym = dlsym(clib, KD_HOOK_SHUTDOWN_STR);
-        shutdown_fn = (KD_SHUTDOWNFN)sym;
+        KD_SHUTDOWNHOOKFN shutdownhook_fn = (KD_SHUTDOWNHOOKFN)sym;
+        shutdownhook_fn ? shutdown_fn = shutdownhook_fn() : shutdown_fn = 0;
+        
         #elif defined(_WIN32)
-        FARPROC sym = GetProcAddress((HMODULE)clib, KD_HOOK_EARLY_THINK_STR);
-        early_fn = (KD_EARLYTHINKFN)sym;
-
         sym = GetProcAddress((HMODULE)clib, KD_HOOK_THINK_STR);
-        think_fn = (KD_THINKFN)sym;
-
-        sym = GetProcAddress((HMODULE)clib, KD_HOOK_LATE_THINK_STR);
-        late_fn = (KD_LATETHINKFN)sym;
+        tick_fn = (KD_TICKFN)sym;
 
         sym = GetProcAddress((HMODULE)clib, KD_HOOK_SETUP_STR);
-        setup_fn = (KD_SETUPFN)sym;
+        setup_fn = (KD_STARTUPFN)sym;
 
         sym = GetProcAddress((HMODULE)clib, KD_HOOK_SHUTDOWN_STR);
         shutdown_fn = (KD_SHUTDOWNFN)sym;
         #endif
 
-        printf("Pre howdy\n");
+        if(KC_EXTRA_LOGGING) {
+                ctx->log_fn("Karbon Core application loop");
+        }
+
         if (setup_fn) {
-                printf("howdy\n");
                 setup_fn();
         }
 
@@ -271,19 +268,11 @@ kc_application_start(
 
                 fundamental_tick();
 
-                if (early_fn) {
-                        early_fn();
+                if (tick_fn) {
+                        tick_fn();
                 }
 
-                if (think_fn) {
-                        think_fn();
-                }
-
-                if (late_fn) {
-                        late_fn();
-                }
-
-                renderer_dx12_render();
+//                renderer_dx12_render();
         }
 
         if(shutdown_fn) {

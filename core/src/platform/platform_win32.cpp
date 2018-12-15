@@ -246,4 +246,16 @@ kci_platform_process(
         return plat->hwnd ? 1 : 0;
 }
 
+
+/* --------------------------------------------------------------- Open GL -- */
+
+
+int
+kci_platform_opengl_make_current(
+        struct kci_platform *plat)
+{
+        BOOL curr = wglMakeCurrent(dc, glrc);
+        return curr == TRUE ? 1 : 0;
+}
+
 #endif

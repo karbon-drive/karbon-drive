@@ -9,6 +9,9 @@
 extern "C" {
 
 
+/* --------------------------------------------------------------- Context -- */
+
+
 int
 kdi_ctx_get_vendor_string(
         void *ctx,
@@ -31,12 +34,19 @@ kdi_ctx_get_exe_dir(
         char **str,
         int *len);
 
+
+/* ------------------------------------------------------------- Allocator -- */
+
+
 int
 kdi_alloc_tagged(
         void *ctx,
         const struct kd_alloc_desc *desc,
         void **out_addr,
         int *out_bytes);
+
+
+/* ---------------------------------------------------------------- Window -- */
 
 
 int
@@ -49,6 +59,21 @@ kdi_window_set(
         void *ctx,
         const struct kd_window_desc *desc);
 
+
+/* ----------------------------------------------------------------- Input -- */
+
+
+/* --------------------------------------------------------------- Open GL -- */
+
+
+int
+kdi_gl_make_current(
+        void *ctx);
+
+
+/* --------------------------------------------------------------- Logging -- */
+
+
 int
 kdi_log(
         void *ctx,
@@ -56,7 +81,10 @@ kdi_log(
         const char *msg);
 
 
-}
+/* -------------------------------------------------------------- Platform -- */
+
+
+} /* extern */
 
 
 #endif

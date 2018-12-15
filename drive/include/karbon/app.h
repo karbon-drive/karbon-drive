@@ -9,6 +9,7 @@
 
 
 #define KD_APP_NAME(name) \
+        KD_API KD_EXPORT void kdi_keep_alive() { kd_load(0); } \
         KD_API KD_EXPORT const char * \
         kd_app_name() { return name; } \
 

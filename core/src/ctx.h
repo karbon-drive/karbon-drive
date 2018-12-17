@@ -4,6 +4,7 @@
 
 #include <karbon/core.h>
 #include <karbon/drive.h>
+#include <vector>
 #include "allocators/tagged_allocator.h"
 #include "platform/platform.h"
 
@@ -29,11 +30,16 @@ struct kci_alloc_fn {
 /* ------------------------------------------------------------------ Libs -- */
 
 
-typedef void *kc_lib;
+struct kd_app {
+        void *lib;
+        KD_STARTUPFN start;
+        KD_TICKFN tick;
+        KD_SHUTDOWNFN close;
+};
 
 
 struct kci_applications {
-        /* array */ kc_lib *libs;
+        std::vector<kd_app> libs;
 };
 
 

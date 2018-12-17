@@ -121,23 +121,11 @@ kc_application_start(
                 ctx->log_fn("Karbon Core Startup... ");
         }
 
-        //void *addr = 0; int bytes = 0;
-        //kci_alloc_housekeeping(ctx, &addr, &bytes);
-
-        std::vector<unsigned char> buf(4096);
-        void *addr = buf.data();
-        int bytes = buf.size();
-        
-
-
-        if(!addr) {
-                return KC_FAIL;
-        }
-
         /* base directory */
         int count = 0;
-        kdi_ctx_get_exe_dir(ctx, 0, &count);
         std::vector<char> base_dir;
+
+        kdi_ctx_get_exe_dir(ctx, 0, &count);
         base_dir.resize(count);
         kdi_ctx_get_exe_dir(ctx, &base_dir[0], 0);
 

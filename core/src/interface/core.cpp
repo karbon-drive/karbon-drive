@@ -58,14 +58,14 @@ kc_ctx_create(
         struct kc_ctx_desc * desc,
         kc_ctx_t *out_ctx)
 {
-        fundamental_startup();
+        //fundamental_startup();
 
         struct kc_ctx *ctx = new kc_ctx{};
         
         ctx->user_data = desc->user_data;
         ctx->log_fn = desc->log_fn ? desc->log_fn : kci_log_stub;
         
-        kci_tag_alloc_init(&ctx->allocator_tagged);
+        //kci_tag_alloc_init(&ctx->allocator_tagged);
         kci_platform_setup(&ctx->platform);
        
         *out_ctx = ctx;
@@ -121,23 +121,26 @@ kc_application_start(
                 ctx->log_fn("Karbon Core Startup... ");
         }
 
-        void *addr = 0; int bytes = 0;
-        kci_alloc_housekeeping(ctx, &addr, &bytes);
+        //void *addr = 0; int bytes = 0;
+        //kci_alloc_housekeeping(ctx, &addr, &bytes);
+
+        std::vector<unsigned char> buf(4096);
+        void *addr = buf.data();
+        int bytes = buf.size();
         
+
+
         if(!addr) {
                 return KC_FAIL;
         }
 
         /* base directory */
-        char *buffer = (char *)addr;
-        char *base_dir = buffer;
         int count = 0;
-        kdi_ctx_get_exe_dir(ctx, &buffer, &count);
-        buffer += count;
+        kdi_ctx_get_exe_dir(ctx, 0, &count);
+        std::vector<char> base_dir;
+        base_dir.resize(count);
+        kdi_ctx_get_exe_dir(ctx, &base_dir[0], 0);
 
-        strncat(buffer, base_dir, bytes);
-        bytes -= strlen(buffer);
-        
         /* symbols to load */
         void * funcs[KD_FUNC_COUNT];
         funcs[KD_PTR_CTX] = (void*)ctx;
@@ -150,15 +153,11 @@ kc_application_start(
         funcs[KD_FUNC_INPUT_KEYBOARD_GET] = nullptr;
         funcs[KD_FUNC_OPENGL_MAKE_CURRENT] = (void*)kdi_gl_make_current;
         funcs[KD_FUNC_LOG] = (void*)kdi_log;
-        
-        /* find libs and load symbols */
-        int lib_count = 0;
-        kc_lib *libs = (kc_lib*)&buffer[0];
-        
+                
         DIR *dir;
         struct dirent *ent;
         
-        if ((dir = opendir (base_dir)) == NULL) {
+        if ((dir = opendir (base_dir.data())) == NULL) {
                 return KC_FAIL;
         }
         
@@ -192,8 +191,8 @@ kc_application_start(
                 }
 
                 /* try load */
-                std::string path = base_dir;
-                path += item_name;
+                std::string path = base_dir.data();
+                path.append(item_name);
                 
                 #ifndef _WIN32
                 kc_lib lib =  dlopen(path.c_str(), RTLD_NOW);
@@ -229,13 +228,6 @@ kc_application_start(
         
         /* copy libs out */
         int lib_bytes = sizeof(kc_lib) * loaded_libs.size();
-
-        kc_lib *lib_arr = 0;
-        kc_array_create_with_capacity(lib_arr, lib_count);
-        kc_array_resize(lib_arr, lib_count);
-        memcpy(lib_arr, loaded_libs.data(), lib_bytes);
-
-        ctx->apps.libs = lib_arr;
 
         /* get tick funcs */
         KD_TICKFN tick_fn = 0;
@@ -284,7 +276,7 @@ kc_application_start(
         /* loop */
         while(kci_platform_process(&ctx->platform)) {
 
-                fundamental_tick();
+                //fundamental_tick();
                 
                 if (tick_fn) {
                         tick_fn();

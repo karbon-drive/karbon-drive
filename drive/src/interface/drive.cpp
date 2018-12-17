@@ -75,7 +75,7 @@ KD_CTX_GET_EXE_DIR_FN kd_ctx_get_exe_dir_fn = 0;
 
 kd_result
 kd_ctx_get_exe_dir(
-        char **out_buffer,
+        char *out_buffer,
         int *out_size)
 {
         if(KD_PCHECK && !ctx) {

@@ -88,7 +88,7 @@ kdi_ctx_get_graphics_api(
 int
 kdi_ctx_get_exe_dir(
         void *ctx,
-        char **out_str,
+        char *out_str,
         int *out_size)
 {
         (void)ctx;
@@ -169,7 +169,7 @@ kdi_ctx_get_exe_dir(
         }
 
         if(out_str) {
-                memcpy(*out_str, buf_path, strlen(buf_path) + 1);
+                memcpy(out_str, buf_path, strlen(buf_path) + 1);
         }
 
         return 1;

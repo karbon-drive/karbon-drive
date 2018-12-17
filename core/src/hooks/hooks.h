@@ -31,7 +31,7 @@ kdi_ctx_get_graphics_api(
 int
 kdi_ctx_get_exe_dir(
         void *ctx,
-        char **str,
+        char *str,
         int *len);
 
 

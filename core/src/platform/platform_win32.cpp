@@ -1,6 +1,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <assert.h>
+#include <gl/GL.h>
 #include "platform.h"
 
 
@@ -214,6 +215,7 @@ kci_platform_setup(
         ctx->hwnd = (void*)hwnd;
         ctx->dc = (void*)dc;
         ctx->glrc = (void*)glrc;
+        ctx->h_instance = (void*)GetModuleHandle(NULL);
 
         /* display window */
         ShowWindow((HWND)ctx->hwnd, SW_SHOW);

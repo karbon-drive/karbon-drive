@@ -104,13 +104,13 @@ kd_ctx_get_graphics_api(
 
 kd_result
 kd_ctx_get_exe_dir(
-        char **out_buffer,
+        char *out_buffer,
         int *out_size);
 
 
 typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char*, int*);
 typedef int(*KD_CTX_GET_GRAPHICS_API_FN)(void*, kd_graphics_api*,int*,int*,int*);
-typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char**, int*);
+typedef int(*KD_CTX_GET_EXE_DIR_FN)(void *, char*, int*);
 
 
 /* ------------------------------------------------------------- Allocator -- */

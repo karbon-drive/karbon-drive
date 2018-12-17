@@ -186,28 +186,43 @@ kc_application_start(
                         continue;
                 }
 
+                if(KC_EXTRA_LOGGING) {
+                        std::string msg = "- Trying " + item_name;
+                        ctx->log_fn(msg.c_str());
+                }
+
                 /* try load */
                 std::string path = base_dir;
                 path += item_name;
                 
                 #ifndef _WIN32
-                kc_lib lib =  dlopen(item_name.c_str(), RTLD_NOW);
+                kc_lib lib =  dlopen(path.c_str(), RTLD_NOW);
                 void *sym = dlsym(lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #else
-                kc_lib lib = (void*)LoadLibrary(item_name.c_str());
+                kc_lib lib = (void*)LoadLibrary(path.c_str());
                 FARPROC sym = GetProcAddress((HMODULE)lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #endif
                 
                 if(lib && load_fn) {
                         if(KC_EXTRA_LOGGING) {
-                                std::string msg = " - Loaded " + item_name;
+                                std::string msg = "- Loaded " + item_name;
                                 ctx->log_fn(msg.c_str());
                         }
                         
                         if(load_fn(funcs)) {
                                 loaded_libs.emplace_back(lib);
+                        }
+                } else {
+                        if(KC_EXTRA_LOGGING && !lib) {
+                                std::string msg = "- Load Fail " + item_name;
+                                ctx->log_fn(msg.c_str());
+
+                        }
+                        if(KC_EXTRA_LOGGING && !load_fn) {
+                                std::string msg = "- No Loader " + item_name;
+                                ctx->log_fn(msg.c_str());
                         }
                 }
         }

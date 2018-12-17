@@ -30,7 +30,19 @@ kci_platform_setup(
         swa.colormap = cmap;
         swa.event_mask = ExposureMask | KeyPressMask;
 
-        win = XCreateWindow(dpy, root, 0, 0, 600, 600, 0, vi->depth, InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+        win = XCreateWindow(
+                dpy,
+                root,
+                0,
+                0,
+                600,
+                600,
+                0,
+                vi->depth,
+                InputOutput,
+                vi->visual,
+                CWColormap | CWEventMask,
+                &swa);
 
         XMapWindow(dpy, win);
         XStoreName(dpy, win, "Karbon Drive");

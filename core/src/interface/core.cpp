@@ -285,7 +285,7 @@ kc_application_start(
         while(kci_platform_process(&ctx->platform)) {
 
                 fundamental_tick();
-
+                
                 if (tick_fn) {
                         tick_fn();
                 }

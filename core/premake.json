@@ -34,7 +34,8 @@
                         "links-linux" : [
                                 "dl",
                                 "X11",
-                                "vulkan"
+                                "vulkan",
+                                "GL"
                         ],
 
                         "links-windows" : [

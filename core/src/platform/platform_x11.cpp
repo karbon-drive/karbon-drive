@@ -5,7 +5,7 @@
 #include <X11/Xlib.h>
 
 
-int
+ int
 kci_platform_setup(
         struct kci_platform *ctx)
 {
@@ -47,10 +47,16 @@ kci_platform_setup(
         XMapWindow(dpy, win);
         XStoreName(dpy, win, "Karbon Drive");
 
+        /* opengl */
+        GLXContext glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
+        glXMakeCurrent(dpy, win, glc);
+
+        /* save */
         ctx->dpy = dpy;
         ctx->root = root;
         ctx->gwa = gwa;
         ctx->win = win;
+        ctx->glc = glc;
 
         return 0;
 }
@@ -60,17 +66,21 @@ int
 kci_platform_process(
         struct kci_platform *win)
 {
-        XEvent xev;
-        XNextEvent(win->dpy, &xev);
+        glXSwapBuffers(win->dpy, win->win);
+
+        while(XPending(win->dpy)) {
+                XEvent xev;
+                XNextEvent(win->dpy, &xev);
         
-        if(xev.type == Expose) {
-                XGetWindowAttributes(win->dpy, win->win, &win->gwa);
-        }
-                
-        else if(xev.type == KeyPress) {
-                XDestroyWindow(win->dpy, win->win);
-                XCloseDisplay(win->dpy);
-                return 0;
+                if(xev.type == Expose) {
+                        XGetWindowAttributes(win->dpy, win->win, &win->gwa);
+                }
+
+                else if(xev.type == KeyPress) {
+                        XDestroyWindow(win->dpy, win->win);
+                        XCloseDisplay(win->dpy);
+                        return 0;
+                }
         }
 
         return 1;
@@ -93,7 +103,8 @@ int
 kci_platform_opengl_make_current(
         struct kci_platform *plat)
 {
-        return 0;
+        glXMakeCurrent(plat->dpy, plat->win, plat->glc);
+        return 1;
 }
 
 

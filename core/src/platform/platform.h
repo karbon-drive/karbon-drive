@@ -6,6 +6,9 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <GL/glx.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #endif
 
 
@@ -27,6 +30,8 @@ struct kci_platform {
         XSetWindowAttributes    swa;
         Window                  win;
         XWindowAttributes       gwa;
+
+        GLXContext glc;
         #endif
 };
 

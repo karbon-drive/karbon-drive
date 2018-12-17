@@ -11,7 +11,11 @@
 #define KD_API
 #endif
 #else
+#ifdef __cplusplus
 #define KD_API extern "C"
+#else
+#define KD_API
+#endif
 #define KD_EXPORT
 #define KD_CALL
 #endif

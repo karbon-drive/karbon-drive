@@ -19,11 +19,11 @@ kci_platform_setup(
         dpy = XOpenDisplay(NULL);
         root = DefaultRootWindow(dpy);
 
-        long visualMask = VisualScreenMask;
-        int numberOfVisuals;
+        long vm = VisualScreenMask;
+        int num_vis;
         XVisualInfo vii = {};
         vii.screen = DefaultScreen(dpy);
-        XVisualInfo *vi = XGetVisualInfo(dpy, visualMask, &vii, &numberOfVisuals);
+        XVisualInfo *vi = XGetVisualInfo(dpy, vm, &vii, &num_vis);
 
         cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
         
@@ -48,6 +48,15 @@ kci_platform_setup(
         XStoreName(dpy, win, "Karbon Drive");
 
         /* opengl */
+        /*
+        int ctx_attrs[] = {
+                GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+                GLX_CONTEXT_MINOR_VERSION_ARB, 2,
+                None
+        };
+        */
+
+        //GLXContext glc = glXCreateContextAttribs(dpy, vi, NULL, True, ctx_attrs);
         GLXContext glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
         glXMakeCurrent(dpy, win, glc);
 

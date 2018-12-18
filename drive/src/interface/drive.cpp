@@ -253,12 +253,13 @@ kd_gl_make_current()
                 return KD_RESULT_CORRUPTED;
         }
         
-        if(KD_PCHECK && !kd_gl_make_current) {
+        if(KD_PCHECK && !kd_gl_make_current_fn) {
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }
         
         int res = kd_gl_make_current_fn(ctx);
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
 
 

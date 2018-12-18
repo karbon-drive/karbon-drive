@@ -172,9 +172,9 @@ typedef int(*KD_WINDOW_SET_FN)(void *, const struct kd_window_desc *desc);
 
 typedef enum _kd_key_state {
         KD_KEY_UP = 0,
-        KD_KEY_UP_EVENT = 1,
-        KD_KEY_DOWN = 2,
-        KD_KEY_DOWN_EVENT = 3,
+        KD_KEY_UP_EVENT = 1 << 0,
+        KD_KEY_DOWN = 1 << 1,
+        KD_KEY_DOWN_EVENT = 1 << 2,
 } kd_key_state;
 
 
@@ -200,6 +200,9 @@ typedef enum _kd_kb_key {
 
         /* dir */
         KD_KB_UP, KD_KB_DOWN, KD_KB_LEFT, KD_KB_RIGHT,
+
+        /* non-keys */
+        KD_KB_ANY,
 
         /* key count */
         KD_KB_COUNT

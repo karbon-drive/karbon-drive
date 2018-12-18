@@ -34,6 +34,10 @@ internal_wnd_proc(HWND hWnd, UINT u_msg, WPARAM  w_param, LPARAM  l_param)
 
         struct kci_platform *ctx = (kci_platform*)GetPropA(hWnd, "Karbon");
 
+        if (!ctx) {
+                return DefWindowProcA(hWnd, u_msg, w_param, l_param);
+        }
+
         switch (u_msg) {
         case WM_CLOSE:
         case WM_QUIT:
@@ -65,44 +69,42 @@ internal_wnd_proc(HWND hWnd, UINT u_msg, WPARAM  w_param, LPARAM  l_param)
                 }
                 break;
         }
-        case WM_LBUTTONDOWN: {
-                if (ctx) {
-                        
-                }
-                break;
-        }
-        case WM_RBUTTONDOWN: {
-                if (ctx) {
-                        
-                }
-                break;
-        }
-        case WM_MBUTTONDOWN: {
-                if (ctx) {
-                        
-                }
-                break;
-        }
-        case WM_LBUTTONUP: {
-                if (ctx) {
-                        
-                }
-                break;
-        }
-        case WM_RBUTTONUP: {
-                if (ctx) {
-                        
-                }
-                break;
-        }
-        case WM_MBUTTONUP: {
-                if (ctx) {
-                        
-                }
-                break;
-        }
         case WM_MOVING: {
                 int i = 0;
+                break;
+        }
+
+        /* keyboard */
+        case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
+        case WM_KEYUP:
+        case WM_SYSKEYUP: {
+                int down = 0;
+                int action = ((l_param >> 31) & 1) ? down = 0 : down = 1;
+
+                if (down) {
+                        ctx->keystate[KD_KB_ANY] = 0;
+                        ctx->keystate[KD_KB_ANY] |= KD_KEY_DOWN;
+                        ctx->keystate[KD_KB_ANY] |= KD_KEY_DOWN_EVENT;
+                }
+                else {
+                        ctx->keystate[KD_KB_ANY] = 0;
+                        ctx->keystate[KD_KB_ANY] |= KD_KEY_UP;
+                        ctx->keystate[KD_KB_ANY] |= KD_KEY_UP_EVENT;
+                }
+
+                break;
+        }
+
+        /* mouse buttons */
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_XBUTTONDOWN:
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_XBUTTONUP: {
                 break;
         }
 
@@ -229,6 +231,12 @@ int
 kci_platform_process(
         struct kci_platform *plat)
 {
+        /* clear keystate events */
+        for(uint8_t &k : plat->keystate) {
+                constexpr uint8_t evts = KD_KEY_UP_EVENT | KD_KEY_DOWN_EVENT;
+                k &= ~(evts);
+        }
+
         /* process messages */
         MSG msg;
 

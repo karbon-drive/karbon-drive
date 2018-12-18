@@ -228,6 +228,23 @@ kdi_window_set(
 /* ----------------------------------------------------------------- Input -- */
 
 
+int
+kdi_input_get_keyboards(
+        void *ctx,
+        struct kd_keyboard_desc *out_desc)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx; 
+ 
+        static uint8_t *kbs[1];
+        kbs[0] = core_ctx->platform.keystate;
+
+        out_desc->kb_count = 1;
+        out_desc->kb_state = kbs;
+
+        return 1;
+}
+
+
 /* --------------------------------------------------------------- Open GL -- */
 
 

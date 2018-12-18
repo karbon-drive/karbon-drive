@@ -148,23 +148,11 @@ kci_load_libs(
 }
 
 
-int
-kci_str_ends_with(
-        const char *str,
-        const char *str_end)
+bool
+str_ends_with(const std::string &value, const std::string &ending)
 {
-        if (!str || !str_end) {
-                return 0;
-        }
-        
-        int len = strlen(str);
-        int len_end = strlen(str_end);
-        
-        if (len_end >  len) {
-                return 0;
-        }
-        
-        return strncmp(str + len - len_end, str_end, len_end) == 0;
+        if (ending.size() > value.size()) return false;
+        return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
 
@@ -196,10 +184,10 @@ kc_application_start(
         funcs[KD_FUNC_ALLOC] = (void*)kdi_alloc_tagged;
         funcs[KD_FUNC_WINDOW_GET] = (void*)kdi_window_get;
         funcs[KD_FUNC_WINDOW_SET] = (void*)kdi_window_set;
-        funcs[KD_FUNC_INPUT_KEYBOARD_GET] = nullptr;
+        funcs[KD_FUNC_INPUT_KEYBOARD_GET] = (void*)kdi_input_get_keyboards;
         funcs[KD_FUNC_OPENGL_MAKE_CURRENT] = (void*)kdi_gl_make_current;
         funcs[KD_FUNC_LOG] = (void*)kdi_log;
-                
+
         DIR *dir;
         struct dirent *ent;
         
@@ -222,7 +210,7 @@ kc_application_start(
                 std::string item_name = ent->d_name;
                 
                 /* check if file ends with extension */
-                if(!kci_str_ends_with(item_name.c_str(), ext)) {
+                if(!str_ends_with(item_name, ext)) {
                         if(KC_EXTRA_LOGGING) {
                                 std::string msg = "- Ignore " + item_name;
                                 ctx->log_fn(msg.c_str());
@@ -242,47 +230,45 @@ kc_application_start(
                 
                 #ifndef _WIN32
                 void *lib =  dlopen(path.c_str(), RTLD_NOW);
+                #else
+                HMODULE lib = LoadLibrary(path.c_str());
+                #endif
+
+                if (!lib) {
+                        continue;
+                }
+
+                #ifndef _WIN32
                 void *sym = dlsym(lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #else
-                kc_lib lib = (void*)LoadLibrary(path.c_str());
                 FARPROC sym = GetProcAddress((HMODULE)lib, KD_HOOK_LOAD_STR);
                 KD_LOAD_FN load_fn = (KD_LOAD_FN)sym;
                 #endif
-                
-                if(lib && load_fn) {
-                        if(KC_EXTRA_LOGGING) {
-                                std::string msg = "- Loaded " + item_name;
-                                ctx->log_fn(msg.c_str());
-                        }
-                        
-                        if(load_fn(funcs)) {
-                                loaded_libs.emplace_back(
-                                        kd_app{
-                                                lib,
-                                                nullptr,
-                                                nullptr,
-                                                nullptr});
-                        }
-                } else {
-                        if(KC_EXTRA_LOGGING && !lib) {
-                                std::string msg = "- Load Fail " + item_name;
-                                ctx->log_fn(msg.c_str());
 
-                        }
-                        if(KC_EXTRA_LOGGING && !load_fn) {
-                                std::string msg = "- No Loader " + item_name;
-                                ctx->log_fn(msg.c_str());
-                        }
-                        
-                        if(lib) {
-                                #ifndef _WIN32
-                                dlclose(lib);
-                                #else
-                                assert(0); // what is close on windows */
-                                #endif
-                        }
+                if(!load_fn) {
+                        #ifndef _WIN32
+                        dlclose(lib);
+                        #else
+                        assert(0); // what is close on windows */
+                        #endif
+                        continue;
                 }
+                
+                if(KC_EXTRA_LOGGING) {
+                        std::string msg = "- Loaded " + item_name;
+                        ctx->log_fn(msg.c_str());
+                }
+                        
+                if(load_fn(funcs)) {
+                        loaded_libs.emplace_back(
+                                kd_app{
+                                        (void*)lib,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr});
+                }
+                
         }
         
         /* copy libs out */

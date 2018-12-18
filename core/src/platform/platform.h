@@ -2,6 +2,9 @@
 #define WINDOW_INCLUDED
 
 
+#include <karbon/drive.h>
+
+
 #if defined(__linux__)
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -33,6 +36,8 @@ struct kci_platform {
 
         GLXContext glc;
         #endif
+
+        uint8_t keystate[KD_KB_COUNT];
 };
 
 

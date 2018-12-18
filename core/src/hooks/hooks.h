@@ -63,6 +63,12 @@ kdi_window_set(
 /* ----------------------------------------------------------------- Input -- */
 
 
+int
+kdi_input_get_keyboards(
+        void *ctx,
+        struct kd_keyboard_desc *out_desc);
+
+
 /* --------------------------------------------------------------- Open GL -- */
 
 

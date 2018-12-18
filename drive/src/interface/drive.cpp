@@ -229,7 +229,7 @@ kd_input_get_keyboards(
                 return KD_RESULT_INVALID_PARAM;
         }
 
-        if (KD_PCHECK && !kd_input_get_keyboards) {
+        if (KD_PCHECK && !kd_input_get_keyboards_fn) {
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }

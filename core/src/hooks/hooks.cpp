@@ -176,6 +176,37 @@ kdi_ctx_get_exe_dir(
 }
 
 
+int
+kdi_ctx_app_index_get(
+        void *ctx,
+        int *curr_idx,
+        int *count)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+
+        *curr_idx = core_ctx->apps.curr;
+        *count = (int)core_ctx->apps.libs.size();
+        
+        return 1;
+}
+
+
+int
+kdi_ctx_app_index_set(
+        void *ctx,
+        int next_idx)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+
+        if((int)core_ctx->apps.libs.size() < next_idx) {
+                return 0;
+        }
+
+        core_ctx->apps.next = next_idx;
+
+        return 1;
+}
+
 /* ------------------------------------------------------------- Allocator -- */
 
 

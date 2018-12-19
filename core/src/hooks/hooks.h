@@ -35,6 +35,19 @@ kdi_ctx_get_exe_dir(
         int *len);
 
 
+int
+kdi_ctx_app_index_get(
+        void *ctx,
+        int *curr_idx,
+        int *count);
+
+
+int
+kdi_ctx_app_index_set(
+        void *ctx,
+        int next_idx);
+
+
 /* ------------------------------------------------------------- Allocator -- */
 
 

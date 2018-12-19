@@ -181,6 +181,8 @@ kc_application_start(
         funcs[KD_FUNC_CTX_VENDOR_STRING] = (void*)kdi_ctx_get_vendor_string;
         funcs[KD_FUNC_CTX_GRAPHICS_API] = nullptr;
         funcs[KD_FUNC_CTX_EXE_DIR] = (void*)kdi_ctx_get_exe_dir;
+        funcs[KD_FUNC_CTX_APP_INDEX_GET] = (void*)kdi_ctx_app_index_get;
+        funcs[KD_FUNC_CTX_APP_INDEX_SET] = (void*)kdi_ctx_app_index_set;
         funcs[KD_FUNC_ALLOC] = (void*)kdi_alloc_tagged;
         funcs[KD_FUNC_WINDOW_GET] = (void*)kdi_window_get;
         funcs[KD_FUNC_WINDOW_SET] = (void*)kdi_window_set;
@@ -289,19 +291,29 @@ kc_application_start(
                 ctx->log_fn("Karbon Core application loop");
         }
 
-        ctx->apps.libs[0].start();
+
+        ctx->apps.curr = (size_t)-1;
+        ctx->apps.next = 0;
 
         /* loop */
         while(kci_platform_process(&ctx->platform)) {
 
+                if(ctx->apps.curr != ctx->apps.next) {
+                        if(ctx->apps.curr < ctx->apps.libs.size()) {
+                                ctx->apps.libs[ctx->apps.curr].close();
+                        }
+                        ctx->apps.curr = ctx->apps.next;
+                        ctx->apps.libs[ctx->apps.curr].start();
+                }
+
                 //fundamental_tick();
                 
-                ctx->apps.libs[0].tick();
+                ctx->apps.libs[ctx->apps.curr].tick();
 
 //                renderer_dx12_render();
         }
 
-        ctx->apps.libs[0].close();
+        ctx->apps.libs[ctx->apps.curr].close();
 
         if(KC_EXTRA_LOGGING) {
                 ctx->log_fn("Karbon has finished");

@@ -3,7 +3,7 @@
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
-
+#include <stdio.h>
 
  int
 kci_platform_setup(
@@ -73,25 +73,42 @@ kci_platform_setup(
 
 int
 kci_platform_process(
-        struct kci_platform *win)
+        struct kci_platform *plat)
 {
-        glXSwapBuffers(win->dpy, win->win);
-
-        while(XPending(win->dpy)) {
-                XEvent xev;
-                XNextEvent(win->dpy, &xev);
-        
-                if(xev.type == Expose) {
-                        XGetWindowAttributes(win->dpy, win->win, &win->gwa);
-                }
-
-                else if(xev.type == KeyPress) {
-                        XDestroyWindow(win->dpy, win->win);
-                        XCloseDisplay(win->dpy);
-                        return 0;
-                }
+        /* clear keystate events */
+        for(uint8_t &k : plat->keystate) {
+                constexpr uint8_t evts = KD_KEY_UP_EVENT | KD_KEY_DOWN_EVENT;
+                k &= ~(evts);
         }
 
+        /* process messages */
+        while(XPending(plat->dpy)) {
+                XEvent xev;
+                XNextEvent(plat->dpy, &xev);
+        
+                if(xev.type == Expose) {
+                        XGetWindowAttributes(plat->dpy, plat->win, &plat->gwa);
+                }
+
+                
+                else if(xev.type == KeyPress) {
+                        //XDestroyWindow(win->dpy, win->win);
+                        //XCloseDisplay(win->dpy);
+                        //return 0;
+                        plat->keystate[KD_KB_ANY] = 0;
+                        plat->keystate[KD_KB_ANY] |= KD_KEY_DOWN_EVENT;
+                        plat->keystate[KD_KB_ANY] |= KD_KEY_DOWN;
+                }
+                else if(xev.type == KeyRelease) {
+                        plat->keystate[KD_KB_ANY] = 0;
+                        plat->keystate[KD_KB_ANY] |= KD_KEY_UP_EVENT;
+                        plat->keystate[KD_KB_ANY] |= KD_KEY_UP;
+                }
+                
+        }
+
+        glXSwapBuffers(plat->dpy, plat->win);
+        
         return 1;
 }
 

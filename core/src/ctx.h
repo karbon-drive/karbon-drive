@@ -40,6 +40,8 @@ struct kd_app {
 
 struct kci_applications {
         std::vector<kd_app> libs;
+        size_t curr;
+        size_t next;
 };
 
 

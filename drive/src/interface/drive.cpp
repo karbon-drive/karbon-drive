@@ -99,6 +99,58 @@ kd_ctx_get_exe_dir(
 }
 
 
+KD_CTX_APP_INDEX_GET_FN kd_ctx_app_index_get_fn = 0;
+
+
+kd_result
+kd_ctx_application_index_get(
+        int *curr_idx,
+        int *app_count)
+{
+        if(KD_PCHECK && !ctx) {
+                KD_ASSERT(!"KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if(KD_PCHECK && (!curr_idx && !app_count)) {
+                KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        if (KD_PCHECK && !kd_ctx_app_index_get_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
+                return KD_RESULT_NO_IMPLEMENTATION;
+        }
+
+        int res = kd_ctx_app_index_get_fn(ctx, curr_idx, app_count);
+
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
+KD_CTX_APP_INDEX_SET_FN kd_ctx_app_index_set_fn = 0;
+
+
+kd_result
+kd_ctx_application_index_set(
+        int next_idx)
+{
+        if(KD_PCHECK && !ctx) {
+                KD_ASSERT(!"KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if (KD_PCHECK && !kd_ctx_app_index_get_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
+                return KD_RESULT_NO_IMPLEMENTATION;
+        }
+
+        int res = kd_ctx_app_index_set_fn(ctx, next_idx);
+
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
 /* ------------------------------------------------------------- Allocator -- */
 
 
@@ -303,6 +355,8 @@ kd_load(void ** funcs)
         kd_ctx_get_vendor_string_fn = (KD_CTX_GET_VENDOR_STRING_FN)funcs[KD_FUNC_CTX_VENDOR_STRING];
         kd_ctx_get_graphics_api_fn = (KD_CTX_GET_GRAPHICS_API_FN)funcs[KD_FUNC_CTX_GRAPHICS_API];
         kd_ctx_get_exe_dir_fn = (KD_CTX_GET_EXE_DIR_FN)funcs[KD_FUNC_CTX_EXE_DIR];
+        kd_ctx_app_index_get_fn = (KD_CTX_APP_INDEX_GET_FN)funcs[KD_FUNC_CTX_APP_INDEX_GET];
+        kd_ctx_app_index_set_fn = (KD_CTX_APP_INDEX_SET_FN)funcs[KD_FUNC_CTX_APP_INDEX_SET];
         kd_alloc_fn = (KD_ALLOC_FN)funcs[KD_FUNC_ALLOC];
         kd_window_get_fn = (KD_WINDOW_GET_FN)funcs[KD_FUNC_WINDOW_GET];
         kd_window_set_fn = (KD_WINDOW_SET_FN)funcs[KD_FUNC_WINDOW_SET];

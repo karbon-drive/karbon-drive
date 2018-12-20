@@ -148,6 +148,24 @@ typedef int(*KD_CTX_APP_INDEX_GET_FN)(void*,int*,int*);
 typedef int(*KD_CTX_APP_INDEX_SET_FN)(void*,int);
 
 
+/* ---------------------------------------------------------------- Events -- */
+
+
+typedef enum _kd_event {
+        KD_EVENT_VIEWPORT_RESIZE = 1 << 0,
+        KD_EVENT_INPUT_KB = 1 << 1,
+} kd_event;
+
+
+kd_result
+kd_events_get(
+        uint64_t *evt);                         /* required */
+
+
+typedef int(*KD_EVENTS_GET_FN)(void*,uint64_t*);
+
+
+
 /* ------------------------------------------------------------- Allocator -- */
 
 
@@ -328,6 +346,7 @@ enum kd_api_hooks {
         KD_FUNC_CTX_EXE_DIR,
         KD_FUNC_CTX_APP_INDEX_GET,
         KD_FUNC_CTX_APP_INDEX_SET,
+        KD_FUNC_EVENTS_GET,
         KD_FUNC_ALLOC,
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,

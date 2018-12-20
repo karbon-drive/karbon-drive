@@ -183,6 +183,7 @@ kc_application_start(
         funcs[KD_FUNC_CTX_EXE_DIR] = (void*)kdi_ctx_get_exe_dir;
         funcs[KD_FUNC_CTX_APP_INDEX_GET] = (void*)kdi_ctx_app_index_get;
         funcs[KD_FUNC_CTX_APP_INDEX_SET] = (void*)kdi_ctx_app_index_set;
+        funcs[KD_FUNC_EVENTS_GET] = (void*)kdi_events_get;
         funcs[KD_FUNC_ALLOC] = (void*)kdi_alloc_tagged;
         funcs[KD_FUNC_WINDOW_GET] = (void*)kdi_window_get;
         funcs[KD_FUNC_WINDOW_SET] = (void*)kdi_window_set;
@@ -296,7 +297,7 @@ kc_application_start(
         ctx->apps.next = 0;
 
         /* loop */
-        while(kci_platform_process(&ctx->platform)) {
+        while(kci_platform_process(&ctx->platform, &ctx->frame_events)) {
 
                 if(ctx->apps.curr != ctx->apps.next) {
                         if(ctx->apps.curr < ctx->apps.libs.size()) {
@@ -311,6 +312,8 @@ kc_application_start(
                 ctx->apps.libs[ctx->apps.curr].tick();
 
 //                renderer_dx12_render();
+
+                ctx->frame_events = 0;
         }
 
         ctx->apps.libs[ctx->apps.curr].close();

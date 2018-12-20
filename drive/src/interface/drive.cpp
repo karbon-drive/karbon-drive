@@ -42,6 +42,7 @@ kd_ctx_get_vendor_string(
 
 KD_CTX_GET_GRAPHICS_API_FN kd_ctx_get_graphics_api_fn = 0;
 
+
 kd_result
 kd_ctx_get_graphics_api(
         kd_graphics_api *out_api,
@@ -146,6 +147,37 @@ kd_ctx_application_index_set(
         }
 
         int res = kd_ctx_app_index_set_fn(ctx, next_idx);
+
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
+/* ---------------------------------------------------------------- Events -- */
+
+
+KD_EVENTS_GET_FN kd_events_get_fn = 0;
+
+
+kd_result
+kd_events_get(
+        uint64_t *events)
+{
+        if(KD_PCHECK && !ctx) {
+                KD_ASSERT(!"KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if(KD_PCHECK && !events) {
+                KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        if(KD_PCHECK && !kd_events_get_fn) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
+                return KD_RESULT_NO_IMPLEMENTATION;
+        }
+
+        int res = kd_events_get_fn(ctx, events);
 
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
@@ -357,6 +389,7 @@ kd_load(void ** funcs)
         kd_ctx_get_exe_dir_fn = (KD_CTX_GET_EXE_DIR_FN)funcs[KD_FUNC_CTX_EXE_DIR];
         kd_ctx_app_index_get_fn = (KD_CTX_APP_INDEX_GET_FN)funcs[KD_FUNC_CTX_APP_INDEX_GET];
         kd_ctx_app_index_set_fn = (KD_CTX_APP_INDEX_SET_FN)funcs[KD_FUNC_CTX_APP_INDEX_SET];
+        kd_events_get_fn = (KD_EVENTS_GET_FN)funcs[KD_FUNC_EVENTS_GET];
         kd_alloc_fn = (KD_ALLOC_FN)funcs[KD_FUNC_ALLOC];
         kd_window_get_fn = (KD_WINDOW_GET_FN)funcs[KD_FUNC_WINDOW_GET];
         kd_window_set_fn = (KD_WINDOW_SET_FN)funcs[KD_FUNC_WINDOW_SET];

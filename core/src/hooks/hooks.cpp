@@ -207,6 +207,22 @@ kdi_ctx_app_index_set(
         return 1;
 }
 
+
+/* ---------------------------------------------------------------- Events -- */
+
+
+int
+kdi_events_get(
+        void *ctx,
+        uint64_t *evts)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+        *evts = core_ctx->frame_events;
+
+        return 1;
+}
+
+
 /* ------------------------------------------------------------- Allocator -- */
 
 

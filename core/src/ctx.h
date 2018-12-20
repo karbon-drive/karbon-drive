@@ -58,6 +58,8 @@ struct kc_ctx {
         struct kci_platform platform;
         
         void *user_data;
+
+        uint64_t frame_events;
 };
 
 #endif

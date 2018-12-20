@@ -49,7 +49,8 @@ kci_platform_setup(
 
 int
 kci_platform_process(
-        struct kci_platform *win);
+        struct kci_platform *win,
+        uint64_t *events);
 
 
 int

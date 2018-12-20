@@ -73,14 +73,16 @@ kci_platform_setup(
 
 int
 kci_platform_process(
-        struct kci_platform *plat)
+        struct kci_platform *plat,
+        uint64_t *events)
 {
         /* clear keystate events */
         for(uint8_t &k : plat->keystate) {
                 constexpr uint8_t evts = KD_KEY_UP_EVENT | KD_KEY_DOWN_EVENT;
                 k &= ~(evts);
         }
-
+        
+        uint64_t new_events = 0;
         /* process messages */
         while(XPending(plat->dpy)) {
                 XEvent xev;
@@ -92,6 +94,8 @@ kci_platform_process(
 
                 
                 else if(xev.type == KeyPress) {
+                        new_events |= KD_EVENT_INPUT_KB;
+
                         //XDestroyWindow(win->dpy, win->win);
                         //XCloseDisplay(win->dpy);
                         //return 0;
@@ -100,6 +104,8 @@ kci_platform_process(
                         plat->keystate[KD_KB_ANY] |= KD_KEY_DOWN;
                 }
                 else if(xev.type == KeyRelease) {
+                        new_events |= KD_EVENT_INPUT_KB;
+
                         plat->keystate[KD_KB_ANY] = 0;
                         plat->keystate[KD_KB_ANY] |= KD_KEY_UP_EVENT;
                         plat->keystate[KD_KB_ANY] |= KD_KEY_UP;
@@ -108,6 +114,8 @@ kci_platform_process(
         }
 
         glXSwapBuffers(plat->dpy, plat->win);
+
+        *events |= new_events;
         
         return 1;
 }

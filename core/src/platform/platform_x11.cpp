@@ -4,6 +4,9 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdio.h>
+#include <assert.h>
+#include <cstring>
+
 
  int
 kci_platform_setup(
@@ -28,7 +31,11 @@ kci_platform_setup(
         cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
         
         swa.colormap = cmap;
-        swa.event_mask = ExposureMask | KeyPressMask;
+        swa.event_mask =
+                ExposureMask |
+                KeyPressMask |
+                KeyReleaseMask |
+                StructureNotifyMask;
 
         win = XCreateWindow(
                 dpy,
@@ -81,8 +88,7 @@ kci_platform_process(
                 constexpr uint8_t evts = KD_KEY_UP_EVENT | KD_KEY_DOWN_EVENT;
                 k &= ~(evts);
         }
-        
-        uint64_t new_events = 0;
+
         /* process messages */
         while(XPending(plat->dpy)) {
                 XEvent xev;
@@ -91,32 +97,35 @@ kci_platform_process(
                 if(xev.type == Expose) {
                         XGetWindowAttributes(plat->dpy, plat->win, &plat->gwa);
                 }
-
-                
                 else if(xev.type == KeyPress) {
-                        new_events |= KD_EVENT_INPUT_KB;
+                        *events |= KD_EVENT_INPUT_KB;
 
                         //XDestroyWindow(win->dpy, win->win);
                         //XCloseDisplay(win->dpy);
                         //return 0;
+                        
                         plat->keystate[KD_KB_ANY] = 0;
                         plat->keystate[KD_KB_ANY] |= KD_KEY_DOWN_EVENT;
                         plat->keystate[KD_KB_ANY] |= KD_KEY_DOWN;
                 }
                 else if(xev.type == KeyRelease) {
-                        new_events |= KD_EVENT_INPUT_KB;
+                        /* Only report up if it was already down */ 
+                        if(plat->keystate[KD_KB_ANY] & KD_KEY_DOWN) {
+                                *events |= KD_EVENT_INPUT_KB;
 
-                        plat->keystate[KD_KB_ANY] = 0;
-                        plat->keystate[KD_KB_ANY] |= KD_KEY_UP_EVENT;
-                        plat->keystate[KD_KB_ANY] |= KD_KEY_UP;
+                                plat->keystate[KD_KB_ANY] = 0;
+                                plat->keystate[KD_KB_ANY] |= KD_KEY_UP_EVENT;
+                                plat->keystate[KD_KB_ANY] |= KD_KEY_UP;
+                        }
+                }
+                else if(xev.type == ConfigureNotify) {
+                        *events |= KD_EVENT_VIEWPORT_RESIZE;
                 }
                 
         }
 
         glXSwapBuffers(plat->dpy, plat->win);
 
-        *events |= new_events;
-        
         return 1;
 }
 
@@ -127,6 +136,32 @@ kci_platform_destroy(
 {
         (void)plat;
         return 0;
+}
+
+
+/* ---------------------------------------------------------------- Window -- */
+
+
+int
+kci_platform_window_size(
+        struct kci_platform *plat,
+        int *width,
+        int *height)
+{
+        //int count = ScreenCount(plat->dpy);
+        //assert(count == 1); /* no support for multi */
+
+        //Screen *sc = ScreenOfDisplay(plat->dpy, 0);
+        //*width = XWidthOfScreen(sc);
+        //*height = XHeightOfScreen(sc);
+        
+        XWindowAttributes xwa;
+        XGetWindowAttributes(plat->dpy, plat->win, &xwa);
+
+        *width = xwa.width;
+        *height = xwa.height;
+
+        return 1;
 }
 
 

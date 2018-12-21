@@ -1,5 +1,6 @@
 #include <karbon/drive.h>
 #include "../config.h"
+#include <stdio.h>
 
 
 extern "C" {

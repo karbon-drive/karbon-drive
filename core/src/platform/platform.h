@@ -58,6 +58,16 @@ kci_platform_destroy(
         struct kci_platform *plat);
 
 
+/* ---------------------------------------------------------------- Window -- */
+
+
+int
+kci_platform_window_size(
+        struct kci_platform *plat,
+        int *width,
+        int *height);
+
+
 /* --------------------------------------------------------------- Open GL -- */
 
 

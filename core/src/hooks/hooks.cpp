@@ -254,10 +254,14 @@ kdi_window_get(
         void *ctx,
         struct kd_window_desc *desc)
 {
-        (void)ctx;
-        (void)desc;
-        
-        return 0;
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+
+        int success = kci_platform_window_size(
+                &core_ctx->platform,
+                &desc->width,
+                &desc->height);
+
+        return success;
 }
 
 int

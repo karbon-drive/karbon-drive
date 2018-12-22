@@ -79,6 +79,8 @@ internal_wnd_proc(HWND hWnd, UINT u_msg, WPARAM  w_param, LPARAM  l_param)
         case WM_SYSKEYDOWN:
         case WM_KEYUP:
         case WM_SYSKEYUP: {
+                ctx->frame_events |= KD_EVENT_INPUT_KB;
+
                 int down = 0;
                 int action = ((l_param >> 31) & 1) ? down = 0 : down = 1;
 
@@ -229,8 +231,11 @@ kci_platform_setup(
 
 int
 kci_platform_process(
-        struct kci_platform *plat)
+        struct kci_platform *plat,
+        uint64_t *events)
 {
+        plat->frame_events = 0;
+
         /* clear keystate events */
         for(uint8_t &k : plat->keystate) {
                 constexpr uint8_t evts = KD_KEY_UP_EVENT | KD_KEY_DOWN_EVENT;
@@ -253,7 +258,24 @@ kci_platform_process(
 
         SwapBuffers((HDC)plat->dc);
 
+        if(events) {
+                *events = plat->frame_events;
+        }
+
         return plat->hwnd ? 1 : 0;
+}
+
+
+/* ---------------------------------------------------------------- Window -- */
+
+
+int
+kci_platform_window_size(
+        struct kci_platform *plat,
+        int *width,
+        int *height)
+{
+        return 1;
 }
 
 

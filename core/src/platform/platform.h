@@ -26,6 +26,8 @@ struct kci_platform {
         int width;
         int height;
 
+        uint64_t frame_events;
+
         #elif defined(__linux__)
         Display                 *dpy;
         Window                  root;

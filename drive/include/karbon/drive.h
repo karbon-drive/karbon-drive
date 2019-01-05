@@ -379,6 +379,9 @@ typedef KD_SHUTDOWNFN(*KD_SHUTDOWNHOOKFN)();
 typedef void(*KD_TICKFN)();
 typedef KD_TICKFN(*KD_TICKHOOKFN)();
 
+#define KD_HOOK_APP_NAME_STR "kd_app_name"
+typedef const char*(*KD_APPNAMEFN)();
+
 
 #ifdef __cplusplus
 } /* extern */

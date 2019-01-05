@@ -3,24 +3,68 @@
                 {
                         "name" : "karbon_core",
                         "kind" : "ConsoleApp",
-                        "language" : "C++",
+                        "language" : "C",
 
                         "files" : [
                                 "./**.json",
                                 "./**.h",
-                                "./**.hpp",
-                                "./**.cpp"
+                                "./src/allocators/**.c",
+                                "./src/app/**.c",
+                                "./src/hooks/**.c",
+                                "./src/interface/**.c",
+
+                                "src/thirdparty/glfw/src/init.c",
+                                "src/thirdparty/glfw/src/input.c",
+                                "src/thirdparty/glfw/src/monitor.c",
+                                "src/thirdparty/glfw/src/context.c",
+                                "src/thirdparty/glfw/src/window.c",
+                                "src/thirdparty/glfw/src/vulkan.c",
+                                "src/thirdparty/glfw/src/egl_context.c",
+                                "src/thirdparty/glfw/src/osmesa_context.c"
                         ],
 
                         "files-macosx" : [
-                                "./**.mm",
-                                "./**.h",
-                                "./**.m",
-                                "./**.storyboard"
+                                "./src/thirdparty/glfw/src/posix_thread.c",
+                                "./src/thirdparty/glfw/src/egl_context.c",
+                                "./src/thirdparty/glfw/src/osmesa_context.c",
+                                "./src/thirdparty/glfw/src/cocoa_init.m",
+                                "./src/thirdparty/glfw/src/cocoa_joystick.m",
+                                "./src/thirdparty/glfw/src/cocoa_monitor.m",
+                                "./src/thirdparty/glfw/src/cocoa_time.c",
+                                "./src/thirdparty/glfw/src/cocoa_window.m",
+                                "./src/thirdparty/glfw/src/nsgl_context.m"
+                        ],
+
+                        "files-linux" : [
+                                "./src/thirdparty/glfw/src/posix_thread.c",
+                                "./src/thirdparty/glfw/src/x11_init.c",
+                                "./src/thirdparty/glfw/src/x11_monitor.c",
+                                "./src/thirdparty/glfw/src/x11_window.c",
+                                "./src/thirdparty/glfw/src/linux_joystick.c",
+                                "./src/thirdparty/glfw/src/posix_time.c",
+                                "./src/thirdparty/glfw/src/posix_thread.c",
+                                "./src/thirdparty/glfw/src/glx_context.c",
+                                "./src/thirdparty/glfw/src/xkb_unicode.c"
+                        ],
+
+                        "files-windows" : [
+                                "./src/thirdparty/glfw/src/win32_init.c",
+                                "./src/thirdparty/glfw/src/win32_monitor.c",
+                                "./src/thirdparty/glfw/src/win32_window.c",
+                                "./src/thirdparty/glfw/src/win32_joystick.c",
+                                "./src/thirdparty/glfw/src/win32_time.c",
+                                "./src/thirdparty/glfw/src/win32_thread.c",
+                                "./src/thirdparty/glfw/src/wgl_context.c"
                         ],
 
                         "include_dirs" : [
-                                "../drive/include/"
+                                "../drive/include/",
+                                "./src/thirdparty/dirent/",
+                                "./src"
+                        ],
+
+                        "include_dirs-windows" : [
+                                "./src/thirdparty/dirent/"
                         ],
 
                         "include_dirs_public" : [
@@ -29,6 +73,19 @@
 
                         "dependencies" : [
                                 "karbon_drive"
+                        ],
+
+                        "defines-macosx" : [
+                                "_GLFW_COCOA"
+                        ],
+
+                        "defines-linux" : [
+                                "_GLFW_X11"
+                        ],
+
+                        "defines-windows" : [
+                                "_GLFW_WIN32",
+                                "_CRT_SECURE_NO_WARNINGS"
                         ],
 
                         "links-linux" : [
@@ -47,8 +104,37 @@
                         ],
 
                         "links-macosx" : [
-                                "Metal.framework",
-                                "Cocoa.framework"
+                                "OpenGL.framework",
+                                "Cocoa.framework",
+                                "CoreFoundation.framework",
+                                "Foundation.framework",
+                                "CoreVideo.framework",
+                                "IOKit.framework"
+                        ],
+
+                        "disable_warning-msvs" : [
+                                "4152",
+                                "4456",
+                                "4244",
+                                "4100",
+                                "4204"
+                        ],
+
+                        "disable_warning-gcc" : [
+                                "int-conversion",
+                                "implicit-function-declaration",
+                                "endif-labels",
+                                "unused-parameter",
+                                "sign-compare"
+                        ],
+
+                        "disable_warning-clang" : [
+                                "int-conversion",
+                                "implicit-function-declaration",
+                                "endif-labels",
+                                "unused-parameter",
+                                "sign-compare",
+                                "missing-field-initializers"
                         ]
                         
                 }

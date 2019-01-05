@@ -31,25 +31,80 @@
 #include <karbon/drive.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#define KDM_PI 3.142
+#define KDM_TAU 2 * KDM_PI
+
+
+/* ---------------------------------------------------------------- Vector -- */
+
+
+kd_result
+kdm_vec3_cross(
+        const float *a,
+        const float *b,
+        float *r);
+
+
+kd_result
+kdm_vec3_dot(
+        const float *a,
+        const float *b,
+        float *out);
+
+
+kd_result
+kdm_vec3_sub(
+        const float *a,
+        const float *b,
+        float *out);
+
+
+kd_result
+kdm_vec3_norm(
+        float *in_out);
+
+
 /* ---------------------------------------------------------------- Matrix -- */
 
 
 kd_result
 kd_mat4_mul(
-        const float *a_mat,                     /* required */
-        const float *b_mat,                     /* required */
-        float *result_mat,                      /* required */
-        int count);                             /* must be greater than 0 */
+        const float *a,                         /* required float[16] */
+        const float *b,                         /* required float[16] */
+        float *result_mat);                     /* must be greater than 0, cannot be a or b */
+
+
+kd_result
+kdm_mat4_id(
+        float *out_mat4);
 
 
 
 kd_result
-kd_mat4_proj(
-        float width,                            /* greater than 0 */
-        float height,                           /* greater than 0 */
+kdm_mat4_lookat(
+        const float *eye_v3,
+        const float *at_v3,
+        const float *up_v3,
+        float *out_mat4);
+
+
+kd_result
+kdm_mat4_perspective_projection(
+        float aspect_ratio,                     /* greater than 0 */
         float near_plane,                       /* greater than 0 */
         float far_plane,                        /* greater than near plane */
-        float fov_angle);                       /* radians */
+        float fov_rads,                         /* radians */
+        float *out);                            /* output float[16] */
+
+
+#ifdef __cplusplus
+} /* extern */
+#endif
 
 
 /* inc guard */

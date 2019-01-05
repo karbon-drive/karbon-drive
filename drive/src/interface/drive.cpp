@@ -3,9 +3,6 @@
 #include <stdio.h>
 
 
-extern "C" {
-
-
 void *ctx = 0;
 
 
@@ -401,6 +398,3 @@ kd_load(void ** funcs)
 
         return 1;
 }
-
-
-} /* extern C */

@@ -24,12 +24,6 @@
         kd_app_gfx_api() { return api; } \
 
 
-#define KD_APP_ICON_LARGE(icon_data, width, height) \
-        KD_API KD_EXPORT void \
-        kd_app_icon_large_details(uint8_t *d, int *w, int *h) { \
-          d = icon_data; *w = width, *h = height; } \
-
-
 /* -------------------------------------------------------- Lifetime hooks -- */
 
 

@@ -276,6 +276,52 @@ kd_input_get_keyboards(
 typedef int(*KD_INPUT_GET_KEYBOARDS_FN)(void*,struct kd_keyboard_desc*desc);
 
 
+/* ----------------------------------------------------------------- Tasks -- */
+
+
+typedef struct kd_task_queue * kd_task_queue_t;
+
+
+struct kd_task_queue_desc {
+        kd_struct_id type_id;
+        void * ext;
+
+        const char *queue_name;
+};
+
+
+kd_result
+kd_task_queue_create(
+        struct kd_task_queue_desc * desc,
+        kd_task_queue_t * out_queue);
+
+
+kd_task_queue_wait(
+        kd_task_queue_t queue);
+
+
+typedef void(*task_fn)(void *arg);
+
+
+struct kd_task_batch_desc {
+        kd_struct_id type_id;
+        void * ext;
+
+        task_fn *tasks;
+        int count;
+
+        kd_task_queue_t queue;
+
+        kd_bool wait_on_submit;
+        kd_bool keep_on_thread;
+};
+
+
+kd_result
+kd_task_batch_submit(
+        struct kd_task_batch_desc *desc);
+
+
 /* --------------------------------------------------------------- Open GL -- */
 
 

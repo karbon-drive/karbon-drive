@@ -256,17 +256,31 @@ kc_ctx_create(
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        glfwSwapInterval(1);
         GLFWwindow *win = glfwCreateWindow(640, 480, "Karbon Drive", NULL, NULL);
+
         glfwMakeContextCurrent(win);
         glfwSetKeyCallback(win, glfw_key_cb);
         glfwSetWindowSizeCallback(win, glfw_window_resize_cb);
-        
+
         //fundamental_startup();
 
         struct kc_ctx *ctx = malloc(sizeof(*ctx));
 
         glfwSetWindowUserPointer(win, ctx);
+        glfwSwapInterval(1);
+
+        GLFWmonitor* mon = glfwGetPrimaryMonitor();
+
+        GLFWvidmode *mode = glfwGetVideoMode(mon);
+        int width = (mode->width / 3) * 2;
+        int height = (mode->height / 3) * 2;
+
+        glfwSetWindowSize(win, width, height);
+
+        int x_pos = (mode->width / 2) - (width / 2);
+        int y_pos = (mode->height / 2) - (height / 2);
+        glfwSetWindowPos(win, x_pos, y_pos);
+
         
         ctx->win = win;
         ctx->user_data = desc->user_data;

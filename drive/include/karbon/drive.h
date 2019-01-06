@@ -296,6 +296,7 @@ kd_task_queue_create(
         kd_task_queue_t * out_queue);
 
 
+kd_result
 kd_task_queue_wait(
         kd_task_queue_t queue);
 

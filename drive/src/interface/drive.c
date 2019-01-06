@@ -377,24 +377,21 @@ kd_log(
 int
 kd_load(void ** funcs)
 {
-        if (!funcs) {
-                return 0;
-        }
+        if (!funcs) { return 0; }
 
         ctx = funcs[KD_PTR_CTX];
         kd_ctx_get_vendor_string_fn = (KD_CTX_GET_VENDOR_STRING_FN)funcs[KD_FUNC_CTX_VENDOR_STRING];
-        kd_ctx_get_graphics_api_fn = (KD_CTX_GET_GRAPHICS_API_FN)funcs[KD_FUNC_CTX_GRAPHICS_API];
-        kd_ctx_get_exe_dir_fn = (KD_CTX_GET_EXE_DIR_FN)funcs[KD_FUNC_CTX_EXE_DIR];
-        kd_ctx_app_index_get_fn = (KD_CTX_APP_INDEX_GET_FN)funcs[KD_FUNC_CTX_APP_INDEX_GET];
-        kd_ctx_app_index_set_fn = (KD_CTX_APP_INDEX_SET_FN)funcs[KD_FUNC_CTX_APP_INDEX_SET];
-        kd_events_get_fn = (KD_EVENTS_GET_FN)funcs[KD_FUNC_EVENTS_GET];
-        kd_alloc_fn = (KD_ALLOC_FN)funcs[KD_FUNC_ALLOC];
-        kd_window_get_fn = (KD_WINDOW_GET_FN)funcs[KD_FUNC_WINDOW_GET];
-        kd_window_set_fn = (KD_WINDOW_SET_FN)funcs[KD_FUNC_WINDOW_SET];
-        kd_gl_make_current_fn = (KD_GL_MAKE_CURRENT)funcs[KD_FUNC_OPENGL_MAKE_CURRENT];
-        kd_input_get_keyboards_fn = (KD_INPUT_GET_KEYBOARDS_FN)funcs[KD_FUNC_INPUT_KEYBOARD_GET];
-        
-        kd_log_fn = (KD_LOG_FN)funcs[KD_FUNC_LOG];
+        kd_ctx_get_graphics_api_fn  = (KD_CTX_GET_GRAPHICS_API_FN)funcs[KD_FUNC_CTX_GRAPHICS_API];
+        kd_ctx_get_exe_dir_fn       = (KD_CTX_GET_EXE_DIR_FN)funcs[KD_FUNC_CTX_EXE_DIR];
+        kd_ctx_app_index_get_fn     = (KD_CTX_APP_INDEX_GET_FN)funcs[KD_FUNC_CTX_APP_INDEX_GET];
+        kd_ctx_app_index_set_fn     = (KD_CTX_APP_INDEX_SET_FN)funcs[KD_FUNC_CTX_APP_INDEX_SET];
+        kd_events_get_fn            = (KD_EVENTS_GET_FN)funcs[KD_FUNC_EVENTS_GET];
+        kd_alloc_fn                 = (KD_ALLOC_FN)funcs[KD_FUNC_ALLOC];
+        kd_window_get_fn            = (KD_WINDOW_GET_FN)funcs[KD_FUNC_WINDOW_GET];
+        kd_window_set_fn            = (KD_WINDOW_SET_FN)funcs[KD_FUNC_WINDOW_SET];
+        kd_gl_make_current_fn       = (KD_GL_MAKE_CURRENT)funcs[KD_FUNC_OPENGL_MAKE_CURRENT];
+        kd_input_get_keyboards_fn   = (KD_INPUT_GET_KEYBOARDS_FN)funcs[KD_FUNC_INPUT_KEYBOARD_GET];
+        kd_log_fn                   = (KD_LOG_FN)funcs[KD_FUNC_LOG];
 
         return 1;
 }

@@ -65,10 +65,6 @@
                         ],
 
                         "include_dirs-windows" : [
-                                "./src/thirdpaty/dirent/"
-                        ],
-
-                        "include_dirs-windows" : [
                                 "./src/thirdparty/dirent/"
                         ],
 

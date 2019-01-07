@@ -49,7 +49,7 @@ kdi_ctx_get_vendor_string(
         if(out_str) {
                 void *dst = (void*)out_str;
                 void *src = (void*)vendor_str;
-                unsigned len = strlen(vendor_str) + 1;
+                size_t len = strlen(vendor_str) + 1;
                 memcpy(dst, src, len);
         }
         
@@ -167,7 +167,7 @@ kdi_ctx_get_exe_dir(
         #undef KC_PATH_MAX
 
         if(out_size) {
-                *out_size = strlen(buf_path) + 1;
+                *out_size = (int)strlen(buf_path) + 1;
         }
 
         if(out_str) {

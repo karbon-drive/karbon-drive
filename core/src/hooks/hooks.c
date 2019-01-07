@@ -210,6 +210,20 @@ kdi_ctx_app_index_set(
 }
 
 
+int
+kdi_ctx_close(
+        void *ctx)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+
+        glfwSetWindowShouldClose(
+                core_ctx->win,
+                1);
+
+        return 1;
+}
+
+
 /* ---------------------------------------------------------------- Events -- */
 
 

@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <thirdparty/glfw/include/GLFW/glfw3.h>
 #include <allocators/tagged_allocator.h>
+#include <stdio.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -271,7 +272,7 @@ kc_ctx_create(
 
         GLFWmonitor* mon = glfwGetPrimaryMonitor();
 
-        GLFWvidmode *mode = glfwGetVideoMode(mon);
+        const GLFWvidmode *mode = glfwGetVideoMode(mon);
         int width = (mode->width / 3) * 2;
         int height = (mode->height / 3) * 2;
 
@@ -427,6 +428,7 @@ kc_application_start(
         funcs[KD_FUNC_CTX_EXE_DIR] = kdi_ctx_get_exe_dir;
         funcs[KD_FUNC_CTX_APP_INDEX_GET] = kdi_ctx_app_index_get;
         funcs[KD_FUNC_CTX_APP_INDEX_SET] = kdi_ctx_app_index_set;
+        funcs[KD_FUNC_CTX_CLOSE] = kdi_ctx_close;
         funcs[KD_FUNC_EVENTS_GET] = kdi_events_get;
         funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
         funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
@@ -483,7 +485,7 @@ kc_application_start(
                 strncat(path, item_name, sizeof(path) - strlen(path));
                 
                 #ifndef _WIN32
-                void *lib =  dlopen(path.c_str(), RTLD_NOW);
+                void *lib =  dlopen(path, RTLD_NOW);
                 #else
                 HMODULE lib = LoadLibrary(path);
                 #endif

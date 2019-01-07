@@ -45,6 +45,11 @@ kdi_ctx_app_index_set(
         int next_idx);
 
 
+int
+kdi_ctx_close(
+        void *ctx);
+
+
 /* ---------------------------------------------------------------- Events -- */
 
 

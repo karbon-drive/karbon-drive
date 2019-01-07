@@ -48,6 +48,8 @@
                         ],
 
                         "files-windows" : [
+                                "./src/thirdparty/dirent/dirent.h",
+
                                 "./src/thirdparty/glfw/src/win32_init.c",
                                 "./src/thirdparty/glfw/src/win32_monitor.c",
                                 "./src/thirdparty/glfw/src/win32_window.c",
@@ -59,8 +61,11 @@
 
                         "include_dirs" : [
                                 "../drive/include/",
-                                "./src/thirdparty/dirent/",
                                 "./src"
+                        ],
+
+                        "include_dirs-windows" : [
+                                "./src/thirdpaty/dirent/"
                         ],
 
                         "include_dirs-windows" : [
@@ -91,8 +96,15 @@
                         "links-linux" : [
                                 "dl",
                                 "X11",
+                                "Xrandr",
                                 "vulkan",
-                                "GL"
+                                "GL",
+                                "Xcursor",
+                                "Xi",
+                                "Xinerama",
+                                "Xxf86vm",
+                                "m",
+                                "pthread"
                         ],
 
                         "links-windows" : [

@@ -141,11 +141,16 @@ kd_ctx_application_index_set(
         int new_idx);
 
 
+kd_result
+kd_ctx_close();
+
+
 typedef int(*KD_CTX_GET_VENDOR_STRING_FN)(void *,char*, int*);
 typedef int(*KD_CTX_GET_GRAPHICS_API_FN)(void*, kd_graphics_api*,int*,int*,int*);
 typedef int(*KD_CTX_GET_EXE_DIR_FN)(void*,char*,int*);
 typedef int(*KD_CTX_APP_INDEX_GET_FN)(void*,int*,int*);
 typedef int(*KD_CTX_APP_INDEX_SET_FN)(void*,int);
+typedef int(*KD_CTX_CLOSE_FN)();
 
 
 /* ---------------------------------------------------------------- Events -- */
@@ -393,6 +398,7 @@ enum kd_api_hooks {
         KD_FUNC_CTX_EXE_DIR,
         KD_FUNC_CTX_APP_INDEX_GET,
         KD_FUNC_CTX_APP_INDEX_SET,
+        KD_FUNC_CTX_CLOSE,
         KD_FUNC_EVENTS_GET,
         KD_FUNC_ALLOC,
         KD_FUNC_WINDOW_GET,

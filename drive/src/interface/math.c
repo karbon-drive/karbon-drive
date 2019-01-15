@@ -3,6 +3,9 @@
 #include <math.h>
 
 
+/* -------------------------------------------------------------- Vector 3 -- */
+
+
 kd_result
 kdm_vec3_cross(
         const float *a,
@@ -84,6 +87,32 @@ kdm_vec3_sub(
         out[0] = a[0] - b[0];
         out[1] = a[1] - b[1];
         out[2] = a[2] - b[2];
+
+        return KD_RESULT_OK;
+}
+
+
+/* -------------------------------------------------------------- Vector 4 -- */
+
+  
+kd_result
+kdm_vec4_dot(
+        const float *a,
+        const float *b,
+        float *out)
+{
+        if(KD_PCHECK && (!out || !a || !b)) {
+                KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        float x = a[0] * b[0];
+        float y = a[1] * b[1];
+        float z = a[2] * b[2];
+        float w = a[3] * b[3];
+        float dot = x + y + z + w;
+
+        *out = dot;
 
         return KD_RESULT_OK;
 }
@@ -188,3 +217,34 @@ kdm_mat4_perspective_projection(
         return KD_RESULT_OK;
 }
 
+
+kd_result
+kdm_mat4_multiply(
+        const float *a,
+        const float *b,
+        float *out)
+{
+        if(KD_PCHECK && (!a || !b || !out)) {
+                KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        
+        int i;
+        for(i = 0; i < 16; ++i) {
+                int row = (i / 4) * 4;
+                int col = (i % 4);
+
+                const float *row_vec = &a[row];
+
+                float col_vec[4];
+                col_vec[0] = b[col + 0];
+                col_vec[1] = b[col + 1];
+                col_vec[2] = b[col + 2];
+                col_vec[3] = b[col + 3];
+
+                kdm_vec4_dot(row_vec, col_vec, &out[i]);
+        }
+
+        return KD_RESULT_OK;
+}

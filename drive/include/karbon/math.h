@@ -102,6 +102,13 @@ kdm_mat4_perspective_projection(
         float *out);                            /* output float[16] */
 
 
+kd_result
+kdm_mat4_multiply(
+        const float *a,
+        const float *b,
+        float *out);
+
+
 #ifdef __cplusplus
 } /* extern */
 #endif

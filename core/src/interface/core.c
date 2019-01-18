@@ -459,15 +459,17 @@ kc_application_start(
                 const char *item_name = ent->d_name;
                 
                 /* check if file ends with extension */
-                if(!str_ends_with(item_name, ext)) {
-                        if(KC_EXTRA_LOGGING) {
-                                char msg[2048] = {0};
-                                strncat(msg, " - Ignore ", sizeof(msg) - strlen(msg));
-                                strncat(msg, item_name, sizeof(msg) - strlen(msg));
+                int ends_with = str_ends_with(item_name, ext);
 
-                                ctx->log_fn(msg);
-                        }
-                
+                if(!ends_with && KC_EXTRA_LOGGING) {
+                        char msg[2048] = {0};
+                        strncat(msg, " - Ignore ", sizeof(msg) - strlen(msg));
+                        strncat(msg, item_name, sizeof(msg) - strlen(msg));
+
+                        ctx->log_fn(msg);
+                }
+
+                if(!ends_with) {
                         continue;
                 }
 
@@ -489,6 +491,19 @@ kc_application_start(
                 #else
                 HMODULE lib = LoadLibrary(path);
                 #endif
+                
+                if(!lib && KC_EXTRA_LOGGING) {
+                        char msg[2048] = {0};
+                        strncat(msg, " - Failed ", sizeof(msg) - strlen(msg));
+                        strncat(msg, item_name, sizeof(msg) - strlen(msg));
+
+                        #ifndef _WIN32
+                        strncat(msg, " - Err: ", sizeof(msg) - strlen(msg));
+                        strncat(msg, dlerror(), sizeof(msg) - strlen(msg));
+                        #endif
+
+                        ctx->log_fn(msg);
+                }
 
                 if (!lib) {
                         continue;

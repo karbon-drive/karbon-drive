@@ -300,7 +300,7 @@ kdi_input_get_keyboards(
         void *ctx,
         struct kd_keyboard_desc *out_desc)
 {
-        kc_ctx_t core_ctx = (kc_ctx_t)ctx; 
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
  
         static uint8_t *kbs[1];
         kbs[0] = core_ctx->keys;
@@ -308,6 +308,23 @@ kdi_input_get_keyboards(
         out_desc->kb_count = 1;
         out_desc->kb_state = kbs;
 
+        return 1;
+}
+
+
+int
+kdi_input_get_mice(
+        void *ctx,
+        struct kd_mouse_desc *out_desc)
+{
+        kc_ctx_t core_ctx = (kc_ctx_t)ctx;
+        
+        static struct ms_state mi[1];
+        mi[0] = core_ctx->mouse;
+        
+        out_desc->ms_count = 1;
+        out_desc->ms_state = mi;
+        
         return 1;
 }
 

@@ -159,6 +159,7 @@ typedef int(*KD_CTX_CLOSE_FN)();
 typedef enum _kd_event {
         KD_EVENT_VIEWPORT_RESIZE = 1 << 0,
         KD_EVENT_INPUT_KB = 1 << 1,
+        KD_EVENT_INPUT_MS = 1 << 2,
 } kd_event;
 
 
@@ -276,9 +277,41 @@ struct kd_keyboard_desc {
 kd_result
 kd_input_get_keyboards(
         struct kd_keyboard_desc *out_desc);
+        
+        
+typedef enum _kd_ms_key {
+        /* keys */
+        KD_MS_LEFT, KD_MS_MIDDLE, KD_MS_RIGHT,
+        
+        /* non-keys */
+        KD_MS_ANY,
+        
+        /* key count */
+        KD_MS_COUNT,
+} kd_ms_key;
+        
+        
+struct ms_state {
+        int dx, dy;
+        int x, y;
+        
+        uint8_t keys[KD_MS_COUNT];
+};
+        
+
+struct kd_mouse_desc {
+        struct ms_state *ms_state;
+        int ms_count;
+};
+
+
+kd_result
+kd_input_get_mice(
+        struct kd_mouse_desc *out_desc);
 
 
 typedef int(*KD_INPUT_GET_KEYBOARDS_FN)(void*,struct kd_keyboard_desc*desc);
+typedef int(*KD_INPUT_GET_MICE_FN)(void*,struct kd_mouse_desc*desc);
 
 
 /* ----------------------------------------------------------------- Tasks -- */
@@ -404,6 +437,7 @@ enum kd_api_hooks {
         KD_FUNC_WINDOW_GET,
         KD_FUNC_WINDOW_SET,
         KD_FUNC_INPUT_KEYBOARD_GET,
+        KD_FUNC_INPUT_MICE_GET,
         KD_FUNC_OPENGL_MAKE_CURRENT,
         KD_FUNC_LOG,
         KD_FUNC_COUNT

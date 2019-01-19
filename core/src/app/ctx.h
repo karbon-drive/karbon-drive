@@ -66,6 +66,8 @@ struct kc_ctx {
         uint64_t frame_events;
 
         uint8_t keys[KD_KB_COUNT];
+        
+        struct ms_state mouse;
 };
 
 #endif

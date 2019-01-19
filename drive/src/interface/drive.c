@@ -343,6 +343,33 @@ kd_input_get_keyboards(
 }
 
 
+KD_INPUT_GET_MICE_FN kd_input_get_mice_fn = 0;
+
+
+kd_result
+kd_input_get_mice(
+        struct kd_mouse_desc *out_desc)
+{
+        if (KD_PCHECK && !ctx) {
+                KD_ASSERT(!"KD_RESULT_CORRUPTED");
+                return KD_RESULT_CORRUPTED;
+        }
+
+        if (KD_PCHECK && !out_desc) {
+                KD_ASSERT(!"KD_RESUILT_INVALID_PARAM");
+                return KD_RESULT_INVALID_PARAM;
+        }
+
+        if (KD_PCHECK && !kd_input_get_mice) {
+                KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
+                return KD_RESULT_NO_IMPLEMENTATION;
+        }
+
+        int res = kd_input_get_mice_fn(ctx, out_desc);
+        return res ? KD_RESULT_OK : KD_RESULT_FAIL;
+}
+
+
 /* --------------------------------------------------------------- Open GL -- */
 
 
@@ -414,6 +441,7 @@ kd_load(void ** funcs)
         kd_window_set_fn            = (KD_WINDOW_SET_FN)funcs[KD_FUNC_WINDOW_SET];
         kd_gl_make_current_fn       = (KD_GL_MAKE_CURRENT)funcs[KD_FUNC_OPENGL_MAKE_CURRENT];
         kd_input_get_keyboards_fn   = (KD_INPUT_GET_KEYBOARDS_FN)funcs[KD_FUNC_INPUT_KEYBOARD_GET];
+        kd_input_get_mice_fn        = (KD_INPUT_GET_MICE_FN)funcs[KD_FUNC_INPUT_MICE_GET];
         kd_log_fn                   = (KD_LOG_FN)funcs[KD_FUNC_LOG];
 
         return 1;

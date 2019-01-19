@@ -93,6 +93,12 @@ kdi_input_get_keyboards(
         struct kd_keyboard_desc *out_desc);
 
 
+int
+kdi_input_get_mice(
+        void *ctx,
+        struct kd_mouse_desc *out_desc);
+
+
 /* --------------------------------------------------------------- Open GL -- */
 
 

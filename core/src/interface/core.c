@@ -180,6 +180,8 @@ glfw_key_cb(
         assert(ctx && "GLFW - User Ptr not set");
 
         kd_kb_key key = glfw_kb_lookup()[glfw_key];
+        
+        ctx->keys[key] = 0;
 
         if (glfw_action == GLFW_PRESS) {
                 ctx->keys[key] |= KD_KEY_DOWN_EVENT;
@@ -202,12 +204,91 @@ glfw_key_cb(
 }
 
 
+static kd_kb_key*
+glfw_ms_lookup() {
+
+        static kd_kb_key *keys = {0};
+
+        if (keys) {
+                return keys;
+        }
+
+        static kd_kb_key key_map[GLFW_MOUSE_BUTTON_LAST] = {0};
+        keys = key_map;
+        
+        int i;
+        for(i = 0; i < GLFW_MOUSE_BUTTON_LAST; ++i) {
+                keys[i] = KD_MS_ANY;
+        }
+
+        keys[GLFW_MOUSE_BUTTON_1] = KD_MS_LEFT;
+        keys[GLFW_MOUSE_BUTTON_2] = KD_MS_MIDDLE;
+        keys[GLFW_MOUSE_BUTTON_3] = KD_MS_RIGHT;
+
+        return keys;
+}
+
+
+static void
+glfw_ms_key_cb(
+        GLFWwindow *win,
+        int key_code,
+        int action,
+        int mods)
+{
+        kc_ctx_t ctx = glfwGetWindowUserPointer(win);
+        
+        kd_ms_key key = glfw_ms_lookup()[key_code];
+        
+        ctx->mouse.keys[key] = 0;
+        
+        if (action == GLFW_PRESS) {
+                ctx->mouse.keys[key] |= KD_KEY_DOWN_EVENT;
+                ctx->mouse.keys[key] |= KD_KEY_DOWN;
+
+                ctx->mouse.keys[KD_MS_ANY] |= KD_KEY_DOWN_EVENT;
+                ctx->mouse.keys[KD_MS_ANY] |= KD_KEY_DOWN;
+
+                ctx->frame_events |= KD_EVENT_INPUT_MS;
+        }
+        else if(action == GLFW_RELEASE) {
+                ctx->mouse.keys[key] |= KD_KEY_UP_EVENT;
+                ctx->mouse.keys[key] |= KD_KEY_UP;
+
+                ctx->mouse.keys[KD_MS_ANY] |= KD_KEY_UP_EVENT;
+                ctx->mouse.keys[KD_MS_ANY] |= KD_KEY_UP;
+
+                ctx->frame_events |= KD_EVENT_INPUT_MS;
+        }
+}
+
+
+static void
+glfw_mouse_move_cb(
+        GLFWwindow *win,
+        double x,
+        double y)
+{
+        kc_ctx_t ctx = glfwGetWindowUserPointer(win);
+        
+        ctx->mouse.dx = (float)x - ctx->mouse.x;
+        ctx->mouse.dy = (float)y - ctx->mouse.y;
+        ctx->mouse.x = (float)x;
+        ctx->mouse.y = (float)y;
+        
+        ctx->frame_events |= KD_EVENT_INPUT_MS;
+}
+
+
 static void
 glfw_window_resize_cb(
         GLFWwindow *win,
         int x,
         int y)
 {
+        (void)x;
+        (void)y;
+        
         kc_ctx_t ctx = glfwGetWindowUserPointer(win);
         assert(ctx && "GLFW - User Ptr not set");
         
@@ -255,13 +336,22 @@ kc_ctx_create(
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+
+        #ifndef __APPLE__
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        #else
+        glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint (GLFW_COCOA_RETINA_FRAMEBUFFER, 0);
+        #endif
 
         GLFWwindow *win = glfwCreateWindow(640, 480, "Karbon Drive", NULL, NULL);
 
         glfwMakeContextCurrent(win);
         glfwSetKeyCallback(win, glfw_key_cb);
         glfwSetWindowSizeCallback(win, glfw_window_resize_cb);
+        glfwSetMouseButtonCallback(win, glfw_ms_key_cb);
+        glfwSetCursorPosCallback(win, glfw_mouse_move_cb);
 
         //fundamental_startup();
 
@@ -423,19 +513,20 @@ kc_application_start(
         /* symbols to load */
         void * funcs[KD_FUNC_COUNT];
         funcs[KD_PTR_CTX] = ctx;
-        funcs[KD_FUNC_CTX_VENDOR_STRING] = kdi_ctx_get_vendor_string;
-        funcs[KD_FUNC_CTX_GRAPHICS_API] = 0;
-        funcs[KD_FUNC_CTX_EXE_DIR] = kdi_ctx_get_exe_dir;
-        funcs[KD_FUNC_CTX_APP_INDEX_GET] = kdi_ctx_app_index_get;
-        funcs[KD_FUNC_CTX_APP_INDEX_SET] = kdi_ctx_app_index_set;
-        funcs[KD_FUNC_CTX_CLOSE] = kdi_ctx_close;
-        funcs[KD_FUNC_EVENTS_GET] = kdi_events_get;
-        funcs[KD_FUNC_ALLOC] = kdi_alloc_tagged;
-        funcs[KD_FUNC_WINDOW_GET] = kdi_window_get;
-        funcs[KD_FUNC_WINDOW_SET] = kdi_window_set;
-        funcs[KD_FUNC_INPUT_KEYBOARD_GET] = kdi_input_get_keyboards;
+        funcs[KD_FUNC_CTX_VENDOR_STRING]   = kdi_ctx_get_vendor_string;
+        funcs[KD_FUNC_CTX_GRAPHICS_API]    = 0;
+        funcs[KD_FUNC_CTX_EXE_DIR]         = kdi_ctx_get_exe_dir;
+        funcs[KD_FUNC_CTX_APP_INDEX_GET]   = kdi_ctx_app_index_get;
+        funcs[KD_FUNC_CTX_APP_INDEX_SET]   = kdi_ctx_app_index_set;
+        funcs[KD_FUNC_CTX_CLOSE]           = kdi_ctx_close;
+        funcs[KD_FUNC_EVENTS_GET]          = kdi_events_get;
+        funcs[KD_FUNC_ALLOC]               = kdi_alloc_tagged;
+        funcs[KD_FUNC_WINDOW_GET]          = kdi_window_get;
+        funcs[KD_FUNC_WINDOW_SET]          = kdi_window_set;
+        funcs[KD_FUNC_INPUT_KEYBOARD_GET]  = kdi_input_get_keyboards;
+        funcs[KD_FUNC_INPUT_MICE_GET]      = kdi_input_get_mice;
         funcs[KD_FUNC_OPENGL_MAKE_CURRENT] = kdi_gl_make_current;
-        funcs[KD_FUNC_LOG] = kdi_log;
+        funcs[KD_FUNC_LOG]                 = kdi_log;
 
         DIR *dir;
         struct dirent *ent;
@@ -528,8 +619,11 @@ kc_application_start(
                 
                 if(KC_EXTRA_LOGGING) {
                         char msg[2048] = {0};
-                        strncat(msg, " - Loaded ", sizeof(msg) - strlen(msg));
-                        strncat(msg, item_name, sizeof(msg) - strlen(msg));
+                        int buf_size = sizeof(msg) - strlen(msg);
+                        strncat(msg, " - Loaded ", buf_size);
+                        
+                        buf_size = sizeof(msg) - strlen(msg);
+                        strncat(msg, item_name, buf_size);
 
                         ctx->log_fn(msg);
                 }
@@ -598,6 +692,11 @@ kc_application_start(
                 for(i = 0; i < KD_KB_COUNT; ++i) {
                         ctx->keys[i] &= ~(KD_KEY_DOWN_EVENT);
                         ctx->keys[i] &= ~(KD_KEY_UP_EVENT);
+                }
+                
+                for(i = 0; i < KD_MS_COUNT; ++i) {
+                        ctx->mouse.keys[i] &= ~(KD_KEY_DOWN_EVENT);
+                        ctx->mouse.keys[i] &= ~(KD_KEY_UP_EVENT);
                 }
 
                 ctx->frame_events = 0;

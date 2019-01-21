@@ -34,14 +34,14 @@ glfw_err_cb(
 static kd_kb_key*
 glfw_kb_lookup() {
 
-        static kd_kb_key *keys = {0};
+        static kd_kb_key *keys = 0;
 
         if (keys) {
                 return keys;
         }
 
-        static kd_kb_key key_map[GLFW_KEY_LAST] = {0};
-        keys = key_map;
+        static kd_kb_key key_map[GLFW_KEY_LAST + 1] = {0};
+        keys = &key_map[0];
 
         keys[GLFW_KEY_SPACE]          = KD_KB_SPACE;
         keys[GLFW_KEY_APOSTROPHE]     = KD_KB_ANY;
@@ -204,17 +204,17 @@ glfw_key_cb(
 }
 
 
-static kd_kb_key*
+static kd_ms_key*
 glfw_ms_lookup() {
 
-        static kd_kb_key *keys = {0};
+        static kd_ms_key *keys = 0;
 
         if (keys) {
                 return keys;
         }
 
-        static kd_kb_key key_map[GLFW_MOUSE_BUTTON_LAST] = {0};
-        keys = key_map;
+        static kd_ms_key key_map[GLFW_MOUSE_BUTTON_LAST + 1] = {0};
+        keys = &key_map[0];
         
         int i;
         for(i = 0; i < GLFW_MOUSE_BUTTON_LAST; ++i) {
@@ -222,8 +222,8 @@ glfw_ms_lookup() {
         }
 
         keys[GLFW_MOUSE_BUTTON_1] = KD_MS_LEFT;
-        keys[GLFW_MOUSE_BUTTON_2] = KD_MS_MIDDLE;
-        keys[GLFW_MOUSE_BUTTON_3] = KD_MS_RIGHT;
+        keys[GLFW_MOUSE_BUTTON_3] = KD_MS_MIDDLE;
+        keys[GLFW_MOUSE_BUTTON_2] = KD_MS_RIGHT;
 
         return keys;
 }
@@ -238,7 +238,8 @@ glfw_ms_key_cb(
 {
         kc_ctx_t ctx = glfwGetWindowUserPointer(win);
         
-        kd_ms_key key = glfw_ms_lookup()[key_code];
+        kd_ms_key *keys = glfw_ms_lookup();
+        kd_ms_key key = keys[key_code];
         
         ctx->mouse.keys[key] = 0;
         
@@ -659,11 +660,15 @@ kc_application_start(
         ctx->apps.curr = (size_t)-1;
         ctx->apps.next = 0;
 
+        memset(ctx->mouse.keys, 0, sizeof(ctx->mouse.keys));
+
         /* loop */
         while(!glfwWindowShouldClose(ctx->win)) {
                 glfwPollEvents();
 
                 if(ctx->apps.curr != ctx->apps.next) {
+                        ctx->frame_events = KD_EVENT_VIEWPORT_RESIZE;
+
                         if(ctx->apps.curr >= 0) {
                                 ctx->apps.libs[ctx->apps.curr].close();
                         }

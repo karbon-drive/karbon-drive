@@ -180,7 +180,7 @@ glfw_key_cb(
         assert(ctx && "GLFW - User Ptr not set");
 
         kd_kb_key key = glfw_kb_lookup()[glfw_key];
-        
+
         ctx->keys[key] = 0;
 
         if (glfw_action == GLFW_PRESS) {
@@ -215,7 +215,7 @@ glfw_ms_lookup() {
 
         static kd_ms_key key_map[GLFW_MOUSE_BUTTON_LAST + 1] = {0};
         keys = &key_map[0];
-        
+
         int i;
         for(i = 0; i < GLFW_MOUSE_BUTTON_LAST; ++i) {
                 keys[i] = KD_MS_ANY;
@@ -237,12 +237,12 @@ glfw_ms_key_cb(
         int mods)
 {
         kc_ctx_t ctx = glfwGetWindowUserPointer(win);
-        
+
         kd_ms_key *keys = glfw_ms_lookup();
         kd_ms_key key = keys[key_code];
-        
+
         ctx->mouse.keys[key] = 0;
-        
+
         if (action == GLFW_PRESS) {
                 ctx->mouse.keys[key] |= KD_KEY_DOWN_EVENT;
                 ctx->mouse.keys[key] |= KD_KEY_DOWN;
@@ -271,12 +271,12 @@ glfw_mouse_move_cb(
         double y)
 {
         kc_ctx_t ctx = glfwGetWindowUserPointer(win);
-        
+
         ctx->mouse.dx = (float)x - ctx->mouse.x;
         ctx->mouse.dy = (float)y - ctx->mouse.y;
         ctx->mouse.x = (float)x;
         ctx->mouse.y = (float)y;
-        
+
         ctx->frame_events |= KD_EVENT_INPUT_MS;
 }
 
@@ -289,10 +289,10 @@ glfw_window_resize_cb(
 {
         (void)x;
         (void)y;
-        
+
         kc_ctx_t ctx = glfwGetWindowUserPointer(win);
         assert(ctx && "GLFW - User Ptr not set");
-        
+
         ctx->frame_events |= KD_EVENT_VIEWPORT_RESIZE;
 }
 
@@ -310,7 +310,7 @@ kci_alloc_housekeeping(struct kc_ctx *ctx, void **addr, int *bytes) {
         alloc_desc.type_id = KD_STRUCT_ALLOC_DESC;
         alloc_desc.ext = 0;
         alloc_desc.allocator_desc = &allocator_desc;
-        
+
         kdi_alloc_tagged(ctx, &alloc_desc, addr, bytes);
 }
 
@@ -373,18 +373,18 @@ kc_ctx_create(
         int y_pos = (mode->height / 2) - (height / 2);
         glfwSetWindowPos(win, x_pos, y_pos);
 
-        
+
         ctx->win = win;
         ctx->user_data = desc->user_data;
         ctx->log_fn = desc->log_fn ? desc->log_fn : kci_log_stub;
-        
+
         //kci_tag_alloc_init(&ctx->allocator_tagged);
         //kci_platform_setup(&ctx->platform);
-       
+
         *out_ctx = ctx;
 
         ctx->log_fn("Karbon CTX created");
-        
+
         return KC_OK;
 }
 
@@ -395,7 +395,7 @@ kc_ctx_user_data(
         void **out_user_data)
 {
         *out_user_data = ctx->user_data;
-        
+
         return KC_OK;
 }
 
@@ -435,7 +435,7 @@ kci_load_libs(
         for(i = 0; i < count; ++i) {
                 void *syms[KC_ARR_COUNT(sym_strs)] = {0};
                 void *lib = apps[i].lib;
-                
+
                 for(j = 0; j < HOOK_COUNT; ++j) {
                         #if defined(__linux__) || defined(__APPLE__)
                         void *sym = dlsym(lib, sym_strs[j]);
@@ -445,9 +445,9 @@ kci_load_libs(
                         syms[j] = sym;
                         #endif
                 }
-                
+
                 struct kd_app *app = &apps[i];
-                
+
                 /* pull out the function pointers */
                 /* order is important -  must match sym_strs */
                 if(syms[HOOK_STARTUP]) {
@@ -455,13 +455,13 @@ kci_load_libs(
                 } else {
                         app->start = kci_dummy_hook;
                 }
-                
+
                 if(syms[HOOK_TICK]) {
                         app->tick = ((KD_TICKHOOKFN)syms[HOOK_TICK])();
                 } else {
                         app->tick = kci_dummy_hook;
                 }
-                
+
                 if(syms[HOOK_SHUTDOWN]) {
                         app->close = ((KD_SHUTDOWNHOOKFN)syms[HOOK_SHUTDOWN])();
                 } else {
@@ -505,7 +505,7 @@ kc_application_start(
         /* base directory */
         int count = 0;
         char *base_dir = 0;
-        
+
         kdi_ctx_get_exe_dir(ctx, 0, &count);
         kc_array_create_with_capacity(base_dir, count);
 
@@ -531,11 +531,11 @@ kc_application_start(
 
         DIR *dir;
         struct dirent *ent;
-        
+
         if ((dir = opendir (base_dir)) == NULL) {
                 return KC_FAIL;
         }
-        
+
         #if defined(__APPLE__)
         const char *ext = ".dylib";
         #elif defined(_WIN32)
@@ -543,13 +543,13 @@ kc_application_start(
         #elif defined(__linux__)
         const char *ext = ".so";
         #endif
-        
+
         struct kd_app *loaded_libs = 0;
         kc_array_create_with_capacity(loaded_libs, 32);
-        
+
         while ((ent = readdir (dir)) != NULL) {
                 const char *item_name = ent->d_name;
-                
+
                 /* check if file ends with extension */
                 int ends_with = str_ends_with(item_name, ext);
 
@@ -577,13 +577,13 @@ kc_application_start(
                 char path[2048] = {0};
                 strncat(path, base_dir, sizeof(path) - strlen(path));
                 strncat(path, item_name, sizeof(path) - strlen(path));
-                
+
                 #ifndef _WIN32
                 void *lib =  dlopen(path, RTLD_NOW);
                 #else
                 HMODULE lib = LoadLibrary(path);
                 #endif
-                
+
                 if(!lib && KC_EXTRA_LOGGING) {
                         char msg[2048] = {0};
                         strncat(msg, " - Failed ", sizeof(msg) - strlen(msg));
@@ -617,39 +617,39 @@ kc_application_start(
                         #endif
                         continue;
                 }
-                
+
                 if(KC_EXTRA_LOGGING) {
                         char msg[2048] = {0};
                         int buf_size = sizeof(msg) - strlen(msg);
                         strncat(msg, " - Loaded ", buf_size);
-                        
+
                         buf_size = sizeof(msg) - strlen(msg);
                         strncat(msg, item_name, buf_size);
 
                         ctx->log_fn(msg);
                 }
-                        
+
                 if(load_fn(funcs)) {
                         struct kd_app app = {0};
                         app.lib = lib;
 
                         kc_array_push(loaded_libs, app);
                 }
-                
+
         }
-        
+
         /* copy libs out */
         ctx->apps.libs = loaded_libs;
 
         int load_count = kc_array_size(loaded_libs);
-        
+
         if(!load_count) {
                 if(KC_EXTRA_LOGGING) {
                         ctx->log_fn("No KD apps to launch");
                 }
                 return KC_FAIL;
         }
-        
+
         /* get tick funcs */
         kci_load_libs(loaded_libs, load_count);
 
@@ -657,7 +657,7 @@ kc_application_start(
                 ctx->log_fn("Karbon Core application loop");
         }
 
-        ctx->apps.curr = (size_t)-1;
+        ctx->apps.curr = -1;
         ctx->apps.next = 0;
 
         memset(ctx->mouse.keys, 0, sizeof(ctx->mouse.keys));
@@ -683,7 +683,7 @@ kc_application_start(
                 }
 
                 //fundamental_tick();
-                
+
                 ctx->apps.libs[ctx->apps.curr].tick();
 
                 //renderer_dx12_render();
@@ -698,7 +698,7 @@ kc_application_start(
                         ctx->keys[i] &= ~(KD_KEY_DOWN_EVENT);
                         ctx->keys[i] &= ~(KD_KEY_UP_EVENT);
                 }
-                
+
                 for(i = 0; i < KD_MS_COUNT; ++i) {
                         ctx->mouse.keys[i] &= ~(KD_KEY_DOWN_EVENT);
                         ctx->mouse.keys[i] &= ~(KD_KEY_UP_EVENT);

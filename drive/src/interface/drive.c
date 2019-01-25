@@ -21,7 +21,7 @@ kd_ctx_get_vendor_string(
                 KD_ASSERT(!"KD_RESULT_CORRUPTED");
                 return KD_RESULT_CORRUPTED;
         }
-        
+
         if(KD_PCHECK && (!out_buffer && !out_size)) {
                 KD_ASSERT(!"KD_RESULT_INVALID_PARAM");
                 return KD_RESULT_INVALID_PARAM;
@@ -31,9 +31,9 @@ kd_ctx_get_vendor_string(
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }
-        
+
         int res = kd_ctx_get_vendor_string_fn(ctx, out_buffer, out_size);
-        
+
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
 
@@ -165,7 +165,7 @@ kd_ctx_close()
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }
-        
+
         int res = kd_ctx_close_fn(ctx);
 
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
@@ -219,17 +219,17 @@ kd_alloc(
                 KD_ASSERT(!"KD_RESULT_CORRUPTED");
                 return KD_RESULT_CORRUPTED;
         }
-        
+
         if(KD_PCHECK && !desc) {
                 KD_ASSERT(!"KD_RESUILT_INVALID_PARAM");
                 return KD_RESULT_INVALID_PARAM;
         }
-        
+
         if(KD_PCHECK && (desc->type_id != KD_STRUCT_ALLOC_DESC)) {
                 KD_ASSERT(!"KD_RESULT_INVALID_DESC");
                 return KD_RESULT_INVALID_DESC;
         }
-        
+
         if(KD_PCHECK && !desc->allocator_desc) {
                 KD_ASSERT(!"KD_RESULT_INVALID_DESC");
                 return KD_RESULT_INVALID_DESC;
@@ -239,9 +239,9 @@ kd_alloc(
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }
-        
+
         int res = kd_alloc_fn(ctx, desc, out_addr, bytes);
-        
+
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }
 
@@ -260,12 +260,12 @@ kd_window_get(
                 KD_ASSERT(!"KD_RESULT_CORRUPTED");
                 return KD_RESULT_CORRUPTED;
         }
-        
+
         if(KD_PCHECK && !desc) {
                 KD_ASSERT(!"KD_RESUILT_INVALID_PARAM");
                 return KD_RESULT_INVALID_PARAM;
         }
-        
+
         if(KD_PCHECK && (desc->type_id != KD_STRUCT_WINDOW_DESC)) {
                 KD_ASSERT(!"KD_RESULT_INVALID_DESC");
                 return KD_RESULT_INVALID_DESC;
@@ -292,12 +292,12 @@ kd_window_set(
                 KD_ASSERT(!"KD_RESULT_CORRUPTED");
                 return KD_RESULT_CORRUPTED;
         }
-        
+
         if(KD_PCHECK && !desc) {
                 KD_ASSERT(!"KD_RESUILT_INVALID_PARAM");
                 return KD_RESULT_INVALID_PARAM;
         }
-        
+
         if(KD_PCHECK && (desc->type_id != KD_STRUCT_WINDOW_DESC)) {
                 KD_ASSERT(!"KD_RESULT_INVALID_DESC");
                 return KD_RESULT_INVALID_DESC;
@@ -360,7 +360,7 @@ kd_input_get_mice(
                 return KD_RESULT_INVALID_PARAM;
         }
 
-        if (KD_PCHECK && !kd_input_get_mice) {
+        if (KD_PCHECK && !kd_input_get_mice_fn) {
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }
@@ -383,12 +383,12 @@ kd_gl_make_current()
                 KD_ASSERT(!"KD_RESULT_CORRUPTED");
                 return KD_RESULT_CORRUPTED;
         }
-        
+
         if(KD_PCHECK && !kd_gl_make_current_fn) {
                 KD_ASSERT(!"KD_RESULT_NO_IMPLEMENTATION");
                 return KD_RESULT_NO_IMPLEMENTATION;
         }
-        
+
         int res = kd_gl_make_current_fn(ctx);
         return res ? KD_RESULT_OK : KD_RESULT_FAIL;
 }

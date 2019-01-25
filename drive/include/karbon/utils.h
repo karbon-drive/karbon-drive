@@ -3,6 +3,8 @@
 
 
 #include <karbon/drive.h>
+#include <stdint.h>
+#include <string.h>
 
 
 #ifdef __cplusplus
@@ -10,23 +12,25 @@ extern "C" {
 #endif
 
 
-struct kdu_buffer {
-        void *memory;
-        int used;
-        int capacity;
-};
+/* --------------------------------------------------------------- C-Array -- */
+/*
+  Some static c-array helpers, more to help code description.
+*/
 
 
-kd_result
-kdu_memory_to_buffer(void *mem, int size, void **out);
+#define KD_ARR_COUNT(arr) (sizeof(arr) / sizeof(arr[0]))
+#define KD_ARR_DATA(arr) &arr[0]
 
 
-kd_result
-kdu_append(void *mem, void *data, int size);
+/* --------------------------------------------------------------- Generic -- */
+/*
+  Generic wrappers that may or maynot be useful.
+*/
 
 
-kd_result
-kdu_pop(void *mem, int size);
+#define KD_UNUSED(var) ((void)var)
+#define KD_MEMZERO(var) (memset(&var, 0, sizeof(var)))
+#define KD_NULL 0
 
 
 #ifdef __cplusplus

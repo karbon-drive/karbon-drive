@@ -277,7 +277,7 @@ kdi_window_get(
                 &desc->width,
                 &desc->height);
 
-        return 0;
+        return 1;
 }
 
 int
